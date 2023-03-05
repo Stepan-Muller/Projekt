@@ -1,0 +1,59 @@
+﻿  main.c
+C:\Users\Admin\source\repos\Raycaster\Raycaster\util.c(8,19): warning C4244: return: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\util.c(24,20): warning C4305: -=: zkrácení z: double na: float
+C:\Users\Admin\source\repos\Raycaster\Raycaster\util.c(26,20): warning C4305: +=: zkrácení z: double na: float
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(54,20): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(59,16): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(61,38): warning C4244: funkce: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(63,20): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(64,20): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(58,26): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(180,24): warning C4244: funkce: float se převádí na GLint; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(180,38): warning C4244: funkce: float se převádí na GLint; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(186,24): warning C4244: funkce: float se převádí na GLint; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(186,38): warning C4244: funkce: float se převádí na GLint; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(187,29): warning C4244: funkce: float se převádí na GLint; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(187,63): warning C4244: funkce: float se převádí na GLint; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(217,37): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(226,37): warning C4244: =: int se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(277,37): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(286,37): warning C4244: =: int se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(333,57): warning C4244: =: int se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(345,57): warning C4244: =: int se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(353,34): warning C4305: +=: zkrácení z: double na: float
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(355,34): warning C4305: -=: zkrácení z: double na: float
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(357,29): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(366,65): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(367,26): warning C4244: =: int se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(382,31): warning C4244: funkce: float se převádí na GLint; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(429,51): warning C4244: funkce: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(204,27): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(264,29): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(359,56): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(376,150): warning C4244: inicializování: float se převádí na int; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(377,156): warning C4244: inicializování: float se převádí na int; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(378,155): warning C4244: inicializování: float se převádí na int; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(389,33): warning C4244: inicializování: float se převádí na int; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(391,26): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(393,35): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(394,35): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(396,64): warning C4244: inicializování: int se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(397,64): warning C4244: inicializování: int se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(403,154): warning C4244: inicializování: double se převádí na int; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(404,160): warning C4244: inicializování: double se převádí na int; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(405,159): warning C4244: inicializování: double se převádí na int; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(446,31): warning C4244: funkce: int se převádí na GLfloat; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(480,21): warning C4305: funkce: zkrácení z: double na: GLclampf
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(480,26): warning C4305: funkce: zkrácení z: double na: GLclampf
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(480,31): warning C4305: funkce: zkrácení z: double na: GLclampf
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(487,20): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(488,20): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(497,20): warning C4244: =: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(490,22): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+C:\Users\Admin\source\repos\Raycaster\Raycaster\main.c(496,41): warning C4244: inicializování: double se převádí na float; může dojít ke ztrátě dat.
+  Vytváří se kód.
+  2 of 12 functions (16.7%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Vytváření kódu se dokončilo.
+  Raycaster.vcxproj -> C:\Users\Admin\source\repos\Raycaster\x64\Release\Raycaster.exe
