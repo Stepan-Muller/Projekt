@@ -14,8 +14,11 @@
 #define PLAYER_SIZE 0.3 // velikost hrace v pixelech
 #define TEXTURE_RESOLUTION 16 // sirka a vyska textur v pixelech
 
+#define DEFAULT_WIDTH 1920
+#define DEFAULT_HEIGHT 1080
+
 #define FOV 60.0
-#define TURN_SPEED 0.0005
+#define TURN_SPEED 0.002
 #define MOVE_SPEED 3
 
 bool debug = false;
@@ -151,54 +154,116 @@ void movePlayer(GLFWwindow* window, float deltaTime)
 void drawDebug()
 {
     // nakreslit mapu
-    int x, y, xOffset, yOffset;
-    for (y = 0; y < mapY; y++)
+    glPointSize(1);
+    glBegin(GL_POINTS);
+
+    for (int y = 0; y < TEXTURE_RESOLUTION * mapY; y++)
     {
-        for (x = 0; x < mapX; x++)
+        for (int x = 0; x < TEXTURE_RESOLUTION * mapX; x++)
         {
-            if (mapWalls[y * mapX + x] == 1)
-                glColor3f(1, 1, 1);
-            else
+            int texture = mapFloors[(int)(y / TEXTURE_RESOLUTION) * mapX + (int)(x / TEXTURE_RESOLUTION)];
+            
+            if (texture == 0)
                 glColor3f(0, 0, 0);
+            else
+            {
+                float textureX = (int)(x) % TEXTURE_RESOLUTION;
+                float textureY = (int)(y) % TEXTURE_RESOLUTION;
 
-            xOffset = x * 64;
-            yOffset = y * 64;
+                int red = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3];
+                int green = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 1];
+                int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2];
 
-            glBegin(GL_QUADS);
-            glVertex2i(xOffset + 1, yOffset + 1);
-            glVertex2i(xOffset + 1, yOffset + 64 - 1);
-            glVertex2i(xOffset + 64 - 1, yOffset + 64 - 1);
-            glVertex2i(xOffset + 64 - 1, yOffset + 1);
-            glEnd();
+                glColor3ub(red, green, blue);
+            }
+
+            glVertex2i(x, y);
         }
     }
 
+    for (int y = 0; y < TEXTURE_RESOLUTION * mapY; y++)
+    {
+        for (int x = 0; x < TEXTURE_RESOLUTION * mapX; x++)
+        {
+            int texture = mapWalls[(int)(y / TEXTURE_RESOLUTION) * mapX + (int)(x / TEXTURE_RESOLUTION)];
+
+            if (texture == 0)
+                glColor3f(0, 0, 0);
+            else
+            {
+                float textureX = (int)(x) % TEXTURE_RESOLUTION;
+                float textureY = (int)(y) % TEXTURE_RESOLUTION;
+
+                int red = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3];
+                int green = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 1];
+                int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2];
+
+                glColor3ub(red, green, blue);
+            }
+
+            glVertex2i(x + TEXTURE_RESOLUTION * (mapX + 1), y);
+        }
+    }
+
+    for (int y = 0; y < TEXTURE_RESOLUTION * mapY; y++)
+    {
+        for (int x = 0; x < TEXTURE_RESOLUTION * mapX; x++)
+        {
+            int texture = mapCeilings[(int)(y / TEXTURE_RESOLUTION) * mapX + (int)(x / TEXTURE_RESOLUTION)];
+
+            if (texture == 0)
+                glColor3f(0, 0, 0);
+            else
+            {
+                float textureX = (int)(x) % TEXTURE_RESOLUTION;
+                float textureY = (int)(y) % TEXTURE_RESOLUTION;
+
+                int red = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3];
+                int green = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 1];
+                int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2];
+
+                glColor3ub(red, green, blue);
+            }
+
+            glVertex2i(x + 2 * TEXTURE_RESOLUTION * (mapX + 1), y);
+        }
+    }
+
+    glEnd();
+
     // nakreslit na mapu hrace
     glColor3f(1, 1, 0);
-    glPointSize(8);
+    glPointSize(4);
     glBegin(GL_POINTS);
-    glVertex2i(playerX * 64, playerY * 64);
+    glVertex2i( playerX                   * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i((playerX +      mapX + 1)  * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i((playerX + 2 * (mapX + 1)) * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
     glEnd();
 
     // ukazat jakym smerem hrac kouka
-    glLineWidth(3);
+    glLineWidth(2);
     glBegin(GL_LINES);
-    glVertex2i(playerX * 64, playerY * 64);
-    glVertex2i(playerX * 64 + playerDeltaX * 20, playerY * 64 + playerDeltaY * 20);
+    glVertex2i( playerX                   * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i( playerX                   * TEXTURE_RESOLUTION + playerDeltaX * 10, playerY * TEXTURE_RESOLUTION + playerDeltaY * 10);
+    glVertex2i((playerX +      mapX + 1)  * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i((playerX +      mapX + 1)  * TEXTURE_RESOLUTION + playerDeltaX * 10, playerY * TEXTURE_RESOLUTION + playerDeltaY * 10);
+    glVertex2i((playerX + 2 * (mapX + 1)) * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i((playerX + 2 * (mapX + 1)) * TEXTURE_RESOLUTION + playerDeltaX * 10, playerY * TEXTURE_RESOLUTION + playerDeltaY * 10);
     glEnd();
 }
 
 void draw3D()
 {
-    int ray, mapPointerX, mapPointerY, mapPointer, deltaOffset;
-    float rayX, rayY, rayAngle, xOffset, yOffset, distance;
-    rayAngle = capRad(playerAngle - degToRad(FOV / 2));
+    float rayX, rayY, xOffset, yOffset;
+    float rayAngle = capRad(playerAngle - degToRad(FOV / 2));
     
+    glPointSize(1);
+    glBegin(GL_POINTS);
+
     // pro kazdy paprsek
-    for (ray = 0; ray <= screenWidth; ray++)
+    for (int ray = 0; ray <= screenWidth; ray++)
     {
         // horizontalni kolize
-        deltaOffset = 0;
         float distanceHorizontal = FLT_MAX, horizontalX = playerX, horizontalY = playerY;
         int horizontalTexture;
         float arcTan = -1 / tan(rayAngle);
@@ -230,11 +295,9 @@ void draw3D()
             }
 
             // hledat kolizi
-            while (deltaOffset < RENDER_DISTANCE)
+            for (int i = 0; i < RENDER_DISTANCE; i++)
             {
-                mapPointerX = (int)(rayX);
-                mapPointerY = (int)(rayY);
-                mapPointer = mapPointerY * mapX + mapPointerX;
+                int mapPointer = (int)(rayY)* mapX + (int)(rayX);
 
                 // pokud trefil
                 if (mapPointer > 0 && mapPointer < mapX * mapY && mapWalls[mapPointer] > 0)
@@ -247,18 +310,14 @@ void draw3D()
                     horizontalTexture = mapWalls[mapPointer];
                     break;
                 }
+                
                 // pokud netrefil, pokracovat
-                else
-                {
-                    rayX += xOffset;
-                    rayY += yOffset;
-                    deltaOffset++;
-                }
+                rayX += xOffset;
+                rayY += yOffset;
             }
         }
 
         // vertikalni kolize
-        deltaOffset = 0;
         float distanceVertical = FLT_MAX, verticalX = playerX, verticalY = playerY;
         int verticalTexture;
         float negativeTan = -tan(rayAngle);
@@ -290,11 +349,9 @@ void draw3D()
             }
 
             // hledat kolizi
-            while (deltaOffset < RENDER_DISTANCE)
+            for (int i = 0; i < RENDER_DISTANCE; i++)
             {
-                mapPointerX = (int)(rayX);
-                mapPointerY = (int)(rayY);
-                mapPointer = mapPointerY * mapX + mapPointerX;
+                int mapPointer = (int)(rayY)* mapX + (int)(rayX);
 
                 // pokud trefil
                 if (mapPointer > 0 && mapPointer < mapX * mapY && mapWalls[mapPointer] > 0)
@@ -307,19 +364,15 @@ void draw3D()
                     verticalTexture = mapWalls[mapPointer];
                     break;
                 }
+                
                 // pokud netrefil, pokracovat
-                else
-                {
-                    rayX += xOffset;
-                    rayY += yOffset;
-                    deltaOffset++;
-                }
+                rayX += xOffset;
+                rayY += yOffset;
             }
         }
 
-        float shade;
+        float distance, shade, textureX;
         int texture;
-        float textureX;
 
         // ponechat si blizsi trefu (horizontalni, nebo vertikalni)
         if (distanceVertical < distanceHorizontal)
@@ -378,9 +431,7 @@ void draw3D()
             int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2] * shade;
 
             glColor3ub(red, green, blue);
-            glBegin(GL_POINTS);
             glVertex2i(ray, y + lineOffset);
-            glEnd();
 
             textureY += textureYStep;
         }
@@ -405,9 +456,7 @@ void draw3D()
                 int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2] * 0.7;
 
                 glColor3ub(red, green, blue);
-                glBegin(GL_POINTS);
                 glVertex2i(ray, y);
-                glEnd();
             }
 
             // nakreslit strop
@@ -420,20 +469,23 @@ void draw3D()
                 int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2] * 1;
 
                 glColor3ub(red, green, blue);
-                glBegin(GL_POINTS);
                 glVertex2i(ray, screenHeight - y);
-                glEnd();
             }
         }
 
         rayAngle = capRad(rayAngle + degToRad(FOV / (screenWidth)));
     }
+
+    glEnd();
 }
 
 void drawSky()
 {
     int scale = screenHeight / 160;
     
+    glPointSize(scale + 1);
+    glBegin(GL_POINTS);
+
     for (int y = 0; y * (scale + 1) < screenHeight / 2; y++)
     {
         for (int x = 0; x < screenWidth / scale; x++)
@@ -443,15 +495,14 @@ void drawSky()
             int blue = skyBox[((int)y * 120 + (int)(x + playerAngle * 240) % 120) * 3 + 2];
 
             glColor3ub(red, green, blue);
-            glPointSize(scale + 1);
-            glBegin(GL_POINTS);
             glVertex2i(x * (scale + 1), y * (scale + 1));
-            glEnd();
         }
     }
+
+    glEnd();
 }
 
-int main(void)
+int WinMain(void)
 {
     GLFWwindow* window;
 
@@ -460,7 +511,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(480, 320, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -478,12 +529,12 @@ int main(void)
     glfwSetWindowSizeCallback(window, window_size_callback);
 
     glClearColor(0.3, 0.3, 0.3, 0);
-    glOrtho(0, 480, 320, 0, -1, 1);
-    screenWidth = 480;
-    screenHeight = 320;
+    glOrtho(0, DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, -1, 1);
+    screenWidth = DEFAULT_WIDTH;
+    screenHeight = DEFAULT_HEIGHT;
     
-    playerX = 5;
-    playerY = 5;
+    playerX = 4;
+    playerY = 4;
     playerDeltaX = cos(playerAngle);
     playerDeltaY = sin(playerAngle);
 
