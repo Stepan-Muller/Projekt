@@ -14,8 +14,8 @@
 #define PLAYER_SIZE 0.3 // velikost hrace v pixelech
 #define TEXTURE_RESOLUTION 16 // sirka a vyska textur v pixelech
 
-#define DEFAULT_WIDTH 1920
-#define DEFAULT_HEIGHT 1080
+#define DEFAULT_WIDTH 1280
+#define DEFAULT_HEIGHT 720
 
 #define FOV 60.0
 #define TURN_SPEED 0.002
