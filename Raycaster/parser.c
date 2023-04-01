@@ -19,7 +19,7 @@ static void skipUntil(FILE* file, char* valueName)
     }
 }
 
-static void parseValue(char* fileName, char* valueName, int* output)
+static void parseInt(char* fileName, char* valueName, int* output)
 {
     FILE* file;
     errno_t error = fopen_s(&file, fileName, "r");
@@ -34,7 +34,22 @@ static void parseValue(char* fileName, char* valueName, int* output)
     fclose(file);
 }
 
-static void parseArray(char* fileName, char* valueName, int* output, int size)
+static void parseString(char* fileName, char* valueName, char* output, int maxLength)
+{
+    FILE* file;
+    errno_t error = fopen_s(&file, fileName, "r");
+
+    if (error)
+        return;
+
+    skipUntil(file, valueName);
+
+    fscanf_s(file, "%s", output, maxLength);
+
+    fclose(file);
+}
+
+static void parseIntArray(char* fileName, char* valueName, int* output, int size)
 {
     FILE* file;
     errno_t error = fopen_s(&file, fileName, "r");

@@ -2,6 +2,7 @@
 #include <math.h>
 
 #define PI 3.1415926535
+#define RATIO 53.1301023542 // uhel v rovnostrannem trojuhelniku s vyskou 1 a sirkou zakladny 1
 
 static float degToRad(float a)
 {
@@ -31,6 +32,13 @@ static float capRad(float a)
 static float euclideanDistance(float aX, float aY, float bX, float bY)
 {
     return sqrtf((bX - aX) * (bX - aX) + (bY - aY) * (bY - aY));
+}
+
+static float absolute(float a)
+{
+    if (a >= 0)
+        return a;
+    return -a;
 }
 
 static float sign(float a)
