@@ -2,8 +2,13 @@
 #include <stdbool.h>
 
 #include <stdio.h>
+#include <stdlib.h>
+#undef max
+#undef min
+#undef textureMap
 
 #include "util.c"
+#include "parser.c"
 
 #include "textures/textureMap.ppm"
 #include "textures/skyBox.ppm"
@@ -14,8 +19,10 @@
 #define PLAYER_SIZE 0.3 // velikost hrace v pixelech
 #define TEXTURE_RESOLUTION 16 // sirka a vyska textur v pixelech
 
-#define DEFAULT_WIDTH 1280
-#define DEFAULT_HEIGHT 720
+#define DEFAULT_WIDTH 1920 // sirka okna v pixelech
+#define DEFAULT_HEIGHT 1080 // vyska okna v pixelch
+
+#define COLUMN_WIDTH 10 // pocet rendrovanych sloupcu
 
 #define FOV 60.0
 #define TURN_SPEED 0.002
@@ -24,6 +31,8 @@
 bool debug = false;
 bool menu = false;
 bool resetMouse = false;
+
+int mapWidth = 0, mapHeight = 0, * mapWalls, * mapFloors, * mapCeilings;
 
 float playerX, playerY, playerDeltaX, playerDeltaY, playerAngle;
 
@@ -77,42 +86,7 @@ void window_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-int mapX = RENDER_DISTANCE, mapY = RENDER_DISTANCE;
-int mapWalls[] =
-{
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 1, 1, 0, 1, 1, 1,
-    1, 0, 1, 0, 0, 0, 0, 1,
-    1, 0, 1, 0, 0, 0, 0, 1,
-    1, 0, 1, 0, 0, 2, 0, 1,
-    1, 0, 1, 0, 0, 0, 0, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-};
-int mapFloors[] = 
-{
-    2, 2, 2, 2, 2, 2, 2, 2,
-    2, 1, 1, 1, 1, 1, 1, 2,
-    2, 1, 2, 2, 1, 2, 2, 2,
-    2, 1, 2, 2, 2, 2, 2, 2,
-    2, 1, 2, 2, 2, 2, 2, 2,
-    2, 1, 2, 2, 2, 2, 2, 2,
-    2, 1, 2, 2, 2, 2, 0, 2,
-    2, 2, 2, 2, 2, 2, 2, 2,
-};
-int mapCeilings[] = 
-{
-    2, 1, 2, 1, 2, 1, 2, 1,
-    1, 2, 1, 2, 1, 2, 1, 2,
-    2, 1, 2, 1, 0, 1, 2, 1,
-    1, 2, 1, 0, 0, 0, 0, 2,
-    2, 1, 2, 0, 0, 0, 0, 1,
-    1, 2, 1, 0, 0, 2, 1, 2,
-    2, 1, 2, 0, 0, 1, 2, 1,
-    1, 2, 1, 2, 1, 2, 1, 2,
-};
-
-void movePlayer(GLFWwindow* window, float deltaTime)
+void movePlayer(GLFWwindow* window, int* mapWalls, int mapWidth, float deltaTime)
 {
     // pokud je v menu, nehybat s hracem
     if (menu)
@@ -120,48 +94,48 @@ void movePlayer(GLFWwindow* window, float deltaTime)
     
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        if (mapWalls[(int)((playerY)) * mapX + (int)((playerX + PLAYER_SIZE * sign(playerDeltaX)))] == 0)
+        if (mapWalls[(int)((playerY)) * mapWidth + (int)((playerX + PLAYER_SIZE * sign(playerDeltaX)))] == 0)
             playerX += playerDeltaX * deltaTime * MOVE_SPEED;
-        if (mapWalls[(int)((playerY + PLAYER_SIZE * sign(playerDeltaY))) * mapX + (int)((playerX))] == 0)
+        if (mapWalls[(int)((playerY + PLAYER_SIZE * sign(playerDeltaY))) * mapWidth + (int)((playerX))] == 0)
             playerY += playerDeltaY * deltaTime * MOVE_SPEED;
     }
 
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        if (mapWalls[(int)((playerY)) * mapX + (int)((playerX - PLAYER_SIZE * sign(playerDeltaX)))] == 0)
+        if (mapWalls[(int)((playerY)) * mapWidth + (int)((playerX - PLAYER_SIZE * sign(playerDeltaX)))] == 0)
             playerX -= playerDeltaX * deltaTime * MOVE_SPEED;
-        if (mapWalls[(int)((playerY - PLAYER_SIZE * sign(playerDeltaY))) * mapX + (int)((playerX))] == 0)
+        if (mapWalls[(int)((playerY - PLAYER_SIZE * sign(playerDeltaY))) * mapWidth + (int)((playerX))] == 0)
             playerY -= playerDeltaY * deltaTime * MOVE_SPEED;
     }
 
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        if (mapWalls[(int)((playerY)) * mapX + (int)((playerX + PLAYER_SIZE * sign(playerDeltaY)))] == 0)
+        if (mapWalls[(int)((playerY)) * mapWidth + (int)((playerX + PLAYER_SIZE * sign(playerDeltaY)))] == 0)
             playerX += playerDeltaY * deltaTime * MOVE_SPEED;
-        if (mapWalls[(int)((playerY - PLAYER_SIZE * sign(playerDeltaX))) * mapX + (int)((playerX))] == 0)
+        if (mapWalls[(int)((playerY - PLAYER_SIZE * sign(playerDeltaX))) * mapWidth + (int)((playerX))] == 0)
             playerY -= playerDeltaX * deltaTime * MOVE_SPEED;
     }
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        if (mapWalls[(int)((playerY)) * mapX + (int)((playerX - PLAYER_SIZE * sign(playerDeltaY)))] == 0)
+        if (mapWalls[(int)((playerY)) * mapWidth + (int)((playerX - PLAYER_SIZE * sign(playerDeltaY)))] == 0)
             playerX -= playerDeltaY * deltaTime * MOVE_SPEED;
-        if (mapWalls[(int)((playerY + PLAYER_SIZE * sign(playerDeltaX))) * mapX + (int)((playerX))] == 0)
+        if (mapWalls[(int)((playerY + PLAYER_SIZE * sign(playerDeltaX))) * mapWidth + (int)((playerX))] == 0)
             playerY += playerDeltaX * deltaTime * MOVE_SPEED;
     }
 }
 
-void drawDebug()
+void drawDebug(int* mapWalls, int* mapFloors, int* mapCeilings, int mapWidth, int mapHeight)
 {
     // nakreslit mapu
     glPointSize(1);
     glBegin(GL_POINTS);
 
-    for (int y = 0; y < TEXTURE_RESOLUTION * mapY; y++)
+    for (int y = 0; y < TEXTURE_RESOLUTION * mapHeight; y++)
     {
-        for (int x = 0; x < TEXTURE_RESOLUTION * mapX; x++)
+        for (int x = 0; x < TEXTURE_RESOLUTION * mapWidth; x++)
         {
-            int texture = mapFloors[(int)(y / TEXTURE_RESOLUTION) * mapX + (int)(x / TEXTURE_RESOLUTION)];
+            int texture = mapFloors[(int)(y / TEXTURE_RESOLUTION) * mapWidth + (int)(x / TEXTURE_RESOLUTION)];
             
             if (texture == 0)
                 glColor3f(0, 0, 0);
@@ -181,11 +155,11 @@ void drawDebug()
         }
     }
 
-    for (int y = 0; y < TEXTURE_RESOLUTION * mapY; y++)
+    for (int y = 0; y < TEXTURE_RESOLUTION * mapHeight; y++)
     {
-        for (int x = 0; x < TEXTURE_RESOLUTION * mapX; x++)
+        for (int x = 0; x < TEXTURE_RESOLUTION * mapWidth; x++)
         {
-            int texture = mapWalls[(int)(y / TEXTURE_RESOLUTION) * mapX + (int)(x / TEXTURE_RESOLUTION)];
+            int texture = mapWalls[(int)(y / TEXTURE_RESOLUTION) * mapWidth + (int)(x / TEXTURE_RESOLUTION)];
 
             if (texture == 0)
                 glColor3f(0, 0, 0);
@@ -201,15 +175,15 @@ void drawDebug()
                 glColor3ub(red, green, blue);
             }
 
-            glVertex2i(x + TEXTURE_RESOLUTION * (mapX + 1), y);
+            glVertex2i(x + TEXTURE_RESOLUTION * (mapWidth + 1), y);
         }
     }
 
-    for (int y = 0; y < TEXTURE_RESOLUTION * mapY; y++)
+    for (int y = 0; y < TEXTURE_RESOLUTION * mapHeight; y++)
     {
-        for (int x = 0; x < TEXTURE_RESOLUTION * mapX; x++)
+        for (int x = 0; x < TEXTURE_RESOLUTION * mapWidth; x++)
         {
-            int texture = mapCeilings[(int)(y / TEXTURE_RESOLUTION) * mapX + (int)(x / TEXTURE_RESOLUTION)];
+            int texture = mapCeilings[(int)(y / TEXTURE_RESOLUTION) * mapWidth + (int)(x / TEXTURE_RESOLUTION)];
 
             if (texture == 0)
                 glColor3f(0, 0, 0);
@@ -225,7 +199,7 @@ void drawDebug()
                 glColor3ub(red, green, blue);
             }
 
-            glVertex2i(x + 2 * TEXTURE_RESOLUTION * (mapX + 1), y);
+            glVertex2i(x + 2 * TEXTURE_RESOLUTION * (mapWidth + 1), y);
         }
     }
 
@@ -236,8 +210,8 @@ void drawDebug()
     glPointSize(4);
     glBegin(GL_POINTS);
     glVertex2i( playerX                   * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
-    glVertex2i((playerX +      mapX + 1)  * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
-    glVertex2i((playerX + 2 * (mapX + 1)) * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i((playerX +      mapWidth + 1)  * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i((playerX + 2 * (mapWidth + 1)) * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
     glEnd();
 
     // ukazat jakym smerem hrac kouka
@@ -245,23 +219,23 @@ void drawDebug()
     glBegin(GL_LINES);
     glVertex2i( playerX                   * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
     glVertex2i( playerX                   * TEXTURE_RESOLUTION + playerDeltaX * 10, playerY * TEXTURE_RESOLUTION + playerDeltaY * 10);
-    glVertex2i((playerX +      mapX + 1)  * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
-    glVertex2i((playerX +      mapX + 1)  * TEXTURE_RESOLUTION + playerDeltaX * 10, playerY * TEXTURE_RESOLUTION + playerDeltaY * 10);
-    glVertex2i((playerX + 2 * (mapX + 1)) * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
-    glVertex2i((playerX + 2 * (mapX + 1)) * TEXTURE_RESOLUTION + playerDeltaX * 10, playerY * TEXTURE_RESOLUTION + playerDeltaY * 10);
+    glVertex2i((playerX +      mapWidth + 1)  * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i((playerX +      mapWidth + 1)  * TEXTURE_RESOLUTION + playerDeltaX * 10, playerY * TEXTURE_RESOLUTION + playerDeltaY * 10);
+    glVertex2i((playerX + 2 * (mapWidth + 1)) * TEXTURE_RESOLUTION, playerY * TEXTURE_RESOLUTION);
+    glVertex2i((playerX + 2 * (mapWidth + 1)) * TEXTURE_RESOLUTION + playerDeltaX * 10, playerY * TEXTURE_RESOLUTION + playerDeltaY * 10);
     glEnd();
 }
 
-void draw3D()
+void draw3D(int* mapWalls, int* mapFloors, int* mapCeilings, int mapWidth, int mapHeight)
 {
     float rayX, rayY, xOffset, yOffset;
     float rayAngle = capRad(playerAngle - degToRad(FOV / 2));
     
-    glPointSize(1);
+    glPointSize(COLUMN_WIDTH);
     glBegin(GL_POINTS);
 
     // pro kazdy paprsek
-    for (int ray = 0; ray <= screenWidth; ray++)
+    for (int ray = 0; ray * COLUMN_WIDTH <= screenWidth; ray++)
     {
         // horizontalni kolize
         float distanceHorizontal = FLT_MAX, horizontalX = playerX, horizontalY = playerY;
@@ -297,10 +271,10 @@ void draw3D()
             // hledat kolizi
             for (int i = 0; i < RENDER_DISTANCE; i++)
             {
-                int mapPointer = (int)(rayY)* mapX + (int)(rayX);
+                int mapPointer = (int)(rayY) * mapWidth + (int)(rayX);
 
                 // pokud trefil
-                if (mapPointer > 0 && mapPointer < mapX * mapY && mapWalls[mapPointer] > 0)
+                if (mapPointer > 0 && mapPointer < mapWidth * mapHeight && mapWalls[mapPointer] > 0)
                 {
                     // ulozit trefeneou pozici, vzdalenost
                     horizontalX = rayX;
@@ -351,10 +325,10 @@ void draw3D()
             // hledat kolizi
             for (int i = 0; i < RENDER_DISTANCE; i++)
             {
-                int mapPointer = (int)(rayY)* mapX + (int)(rayX);
+                int mapPointer = (int)(rayY)*mapWidth + (int)(rayX);
 
                 // pokud trefil
-                if (mapPointer > 0 && mapPointer < mapX * mapY && mapWalls[mapPointer] > 0)
+                if (mapPointer > 0 && mapPointer < mapWidth * mapHeight && mapWalls[mapPointer] > 0)
                 {
                     // ulozit trefeneou pozici, vzdalenost
                     verticalX = rayX;
@@ -431,7 +405,7 @@ void draw3D()
             int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2] * shade;
 
             glColor3ub(red, green, blue);
-            glVertex2i(ray, y + lineOffset);
+            glVertex2i(ray * COLUMN_WIDTH, y + lineOffset);
 
             textureY += textureYStep;
         }
@@ -447,7 +421,7 @@ void draw3D()
             float textureX = (int)(flatX * TEXTURE_RESOLUTION) % TEXTURE_RESOLUTION;
             float textureY = (int)(flatY * TEXTURE_RESOLUTION) % TEXTURE_RESOLUTION;
 
-            int texture = mapFloors[(int)(flatY) * mapX + (int)(flatX)];
+            int texture = mapFloors[(int)(flatY) * mapWidth + (int)(flatX)];
             
             if (texture != 0)
             {
@@ -456,11 +430,11 @@ void draw3D()
                 int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2] * 0.7;
 
                 glColor3ub(red, green, blue);
-                glVertex2i(ray, y);
+                glVertex2i(ray * COLUMN_WIDTH, y);
             }
 
             // nakreslit strop
-            texture = mapCeilings[(int)(flatY) * mapX + (int)(flatX)];
+            texture = mapCeilings[(int)(flatY) * mapWidth + (int)(flatX)];
             
             if (texture != 0)
             {
@@ -469,11 +443,11 @@ void draw3D()
                 int blue = textureMap[((texture - 1) * TEXTURE_RESOLUTION * TEXTURE_RESOLUTION + (int)textureY * TEXTURE_RESOLUTION + (int)textureX) * 3 + 2] * 1;
 
                 glColor3ub(red, green, blue);
-                glVertex2i(ray, screenHeight - y);
+                glVertex2i(ray * COLUMN_WIDTH, screenHeight - y);
             }
         }
 
-        rayAngle = capRad(rayAngle + degToRad(FOV / (screenWidth)));
+        rayAngle = capRad(rayAngle + degToRad(FOV / (screenWidth) * COLUMN_WIDTH));
     }
 
     glEnd();
@@ -502,7 +476,27 @@ void drawSky()
     glEnd();
 }
 
-int WinMain(void)
+static void loadMap(char* name)
+{
+    mapWidth = 0;
+    parseValue(name, "width", &mapWidth);
+
+    mapHeight = 0;
+    parseValue(name, "height", &mapHeight);
+
+    int mapSize = mapWidth * mapHeight;
+
+    mapWalls = (int*)realloc(mapWalls, mapSize * sizeof(int));
+    parseArray(name, "mapWalls", mapWalls, mapSize);
+
+    mapFloors = (int*)realloc(mapFloors, mapSize * sizeof(int));
+    parseArray(name, "mapFloors", mapFloors, mapSize);
+
+    mapCeilings = (int*)realloc(mapCeilings, mapSize * sizeof(int));
+    parseArray(name, "mapCeilings", mapCeilings, mapSize);
+}
+
+int main(void)
 {
     GLFWwindow* window;
 
@@ -540,6 +534,8 @@ int WinMain(void)
 
     float lastTime = glfwGetTime();
 
+    loadMap("map_1.txt");
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -548,16 +544,16 @@ int WinMain(void)
         lastTime = glfwGetTime();
         
         // pohyb hrace
-        movePlayer(window, deltaTime);
+        movePlayer(window, mapWalls, mapWidth, deltaTime);
 
         // renderovani
         glClear(GL_COLOR_BUFFER_BIT);
 
         drawSky();
-        draw3D();
+        draw3D(mapWalls, mapFloors, mapCeilings, mapWidth, mapHeight);
 
         if (debug)
-            drawDebug();
+            drawDebug(mapWalls, mapFloors, mapCeilings, mapWalls, mapHeight);
 
         glfwSwapBuffers(window);
 

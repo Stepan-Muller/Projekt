@@ -21,5 +21,11 @@
     <ClCompile Include="util.c">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
+    <ClCompile Include="parser.c">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="map_1.txt" />
   </ItemGroup>
 </Project>
