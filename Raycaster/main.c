@@ -10,8 +10,8 @@
 #include "util.c"
 #include "parser.c"
 
-#include "textures/textureMap.ppm"
-#include "textures/skyBox.ppm"
+#include "../textures/textureMap.ppm"
+#include "../textures/skyBox.ppm"
 
 /* Konstanty */
 #define RENDER_DISTANCE 8
@@ -159,12 +159,21 @@ void movePlayer(GLFWwindow* window)
         moveY += playerDeltaX * deltaTime * MOVE_SPEED;
     }
 
-    if (mapWalls[(int)(playerY + PLAYER_SIZE) * mapWidth + (int)(playerX + moveX + PLAYER_SIZE * sign(moveX))] == 0 &&
-        mapWalls[(int)(playerY - PLAYER_SIZE) * mapWidth + (int)(playerX + moveX + PLAYER_SIZE * sign(moveX))] == 0)
+    // kontrola hitboxu
+    float hitboxX1 = playerX + moveX + PLAYER_SIZE * sign(moveX);
+    float hitboxX2 = playerX + moveX + PLAYER_SIZE * sign(moveX);
+    float hitboxY1 = playerY + PLAYER_SIZE;
+    float hitboxY2 = playerY - PLAYER_SIZE;
+    
+    if (hitboxX1 >= 0 && hitboxX1 < mapWidth && mapWalls[(int)hitboxY1 * mapWidth + (int)hitboxX1] == 0 && mapWalls[(int)hitboxY2 * mapWidth + (int)hitboxX2] == 0)
         playerX += moveX;
 
-    if (mapWalls[(int)(playerY + moveY + PLAYER_SIZE * sign(moveY)) * mapWidth + (int)(playerX + PLAYER_SIZE)] == 0 &&
-        mapWalls[(int)(playerY + moveY + PLAYER_SIZE * sign(moveY)) * mapWidth + (int)(playerX - PLAYER_SIZE)] == 0)
+    hitboxX1 = playerX + PLAYER_SIZE;
+    hitboxX2 = playerX - PLAYER_SIZE;
+    hitboxY1 = playerY + moveY + PLAYER_SIZE * sign(moveY);
+    hitboxY2 = playerY + moveY + PLAYER_SIZE * sign(moveY);
+
+    if (hitboxY1 >= 0 && hitboxY1 < mapHeight && mapWalls[(int)hitboxY1 * mapWidth + (int)hitboxX1] == 0 && mapWalls[(int)hitboxY2 * mapWidth + (int)hitboxX2] == 0)
         playerY += moveY;
 }
 
@@ -316,8 +325,20 @@ void draw3D()
             {
                 int mapPointer = (int)(rayY) * mapWidth + (int)(rayX);
 
+                // pokud je mímo mapu
+                if (rayX < 0 || rayX >= mapWidth || rayY < 0 || rayY >= mapHeight)
+                {
+                    // ulozit trefeneou pozici, vzdalenost
+                    horizontalX = rayX;
+                    horizontalY = rayY;
+
+                    distanceHorizontal = euclideanDistance(playerX, playerY, horizontalX, horizontalY);
+                    horizontalTexture = 1;
+                    break;
+                }
+                
                 // pokud trefil
-                if (mapPointer > 0 && mapPointer < mapWidth * mapHeight && mapWalls[mapPointer] > 0)
+                if (mapWalls[mapPointer] > 0)
                 {
                     // ulozit trefeneou pozici, vzdalenost
                     horizontalX = rayX;
@@ -370,8 +391,20 @@ void draw3D()
             {
                 int mapPointer = (int)(rayY)*mapWidth + (int)(rayX);
 
+                // pokud je mimo mapu
+                if (rayX < 0 || rayX >= mapWidth || rayY < 0 || rayY >= mapHeight)
+                {
+                    // ulozit trefeneou pozici, vzdalenost
+                    verticalX = rayX;
+                    verticalY = rayY;
+
+                    distanceVertical = euclideanDistance(playerX, playerY, verticalX, verticalY);
+                    verticalTexture = 1;
+                    break;
+                }
+                
                 // pokud trefil
-                if (mapPointer > 0 && mapPointer < mapWidth * mapHeight && mapWalls[mapPointer] > 0)
+                if (mapWalls[mapPointer] > 0)
                 {
                     // ulozit trefeneou pozici, vzdalenost
                     verticalX = rayX;
@@ -464,7 +497,9 @@ void draw3D()
             float textureX = (int)(flatX * TEXTURE_RESOLUTION) % TEXTURE_RESOLUTION;
             float textureY = (int)(flatY * TEXTURE_RESOLUTION) % TEXTURE_RESOLUTION;
 
-            int texture = mapFloors[(int)(flatY) * mapWidth + (int)(flatX)];
+            int texture = 0;
+            if (flatX >= 0 && flatX < mapWidth && flatY >= 0 && flatY < mapHeight)
+                texture = mapFloors[(int)(flatY) * mapWidth + (int)(flatX)];
             
             if (texture != 0)
             {
@@ -477,7 +512,8 @@ void draw3D()
             }
 
             // nakreslit strop
-            texture = mapCeilings[(int)(flatY) * mapWidth + (int)(flatX)];
+            if (flatX >= 0 && flatX < mapWidth && flatY >= 0 && flatY < mapHeight)
+                texture = mapCeilings[(int)(flatY) * mapWidth + (int)(flatX)];
             
             if (texture != 0)
             {
@@ -552,7 +588,7 @@ int WinMain(void)
 
     float lastTime = glfwGetTime();
 
-    loadMap("map_1.txt");
+    loadMap("../levels/map_1.txt");
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))

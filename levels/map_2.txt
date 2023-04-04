@@ -4,7 +4,7 @@
 # spawnX 5
 # spawnY 5
 
-# nextLevel map_1.txt
+# nextLevel ../levels/map_1.txt
 
 # mapWalls
 1 1 1 1 1 1 1 1
