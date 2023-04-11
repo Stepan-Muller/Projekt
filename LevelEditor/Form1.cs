@@ -18,14 +18,40 @@ namespace LevelEditor
         const int IMAGE_GAP = 6;
         const int FIRST_IMAGE_X = 38;
         const int FIRST_IMAGE_Y = 38;
-        
-        List<List<PictureBox>> table;
+
+        Panel[] panels = new Panel[3];
+
+        List<List<PictureBox>>[] maps = new List<List<PictureBox>>[3];
+
+        List<Bitmap> bitmaps;
+
+        List<PictureBox> textureBoxes;
+        int selectedTexture = 0;
 
         public Form1()
         {
             InitializeComponent();
 
-            table = new List<List<PictureBox>>() { new List<PictureBox>() { pictureBox1 } };
+            panels[0] = panel1;
+            panels[1] = panel2;
+            panels[2] = panel3;
+
+            maps[0] = new List<List<PictureBox>>() { new List<PictureBox>() { pictureBox1 } };
+            maps[1] = new List<List<PictureBox>>() { new List<PictureBox>() { pictureBox2 } };
+            maps[2] = new List<List<PictureBox>>() { new List<PictureBox>() { pictureBox3 } };
+
+            Bitmap bitmap1 = new Bitmap(32, 32);
+            bitmap1.SetPixel(10, 10, Color.Red);
+
+            Bitmap bitmap2 = new Bitmap(32, 32);
+            bitmap2.SetPixel(10, 10, Color.Green);
+
+            Bitmap bitmap3 = new Bitmap(32, 32);
+            bitmap3.SetPixel(10, 10, Color.Blue);
+
+            bitmaps = new List<Bitmap>() { bitmap1, bitmap2, bitmap3 };
+
+            textureBoxes = new List<PictureBox>() { pictureBox4, pictureBox5, pictureBox6 };
         }
 
         private void browseButton_Click(object sender, EventArgs e)
@@ -44,15 +70,19 @@ namespace LevelEditor
 
         private void buttonAddX_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < table.Count; i++)
+            for (int i = 0; i < 3; i++)
             {
-                PictureBox pictureBox = new PictureBox();
-                panel1.Controls.Add(pictureBox);
-                pictureBox.Size = new Size(IMAGE_SIZE, IMAGE_SIZE);
-                pictureBox.Location = new Point(FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * (table[i].Count), FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * i);
-                pictureBox.BorderStyle = BorderStyle.FixedSingle;
+                for (int j = 0; j < maps[i].Count; j++)
+                {
+                    PictureBox pictureBox = new PictureBox();
+                    panels[i].Controls.Add(pictureBox);
+                    pictureBox.Size = new Size(IMAGE_SIZE, IMAGE_SIZE);
+                    pictureBox.Location = new Point(FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * (maps[i][j].Count), FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * j);
+                    pictureBox.BorderStyle = BorderStyle.FixedSingle;
+                    pictureBox.Click += new System.EventHandler(Cell_Click);
 
-                table[i].Add(pictureBox);
+                    maps[i][j].Add(pictureBox);
+                }
             }
 
             buttonAddX.Location = new Point(buttonAddX.Location.X + (IMAGE_SIZE + IMAGE_GAP), buttonAddX.Location.Y);
@@ -63,17 +93,21 @@ namespace LevelEditor
 
         private void buttonAddY_Click(object sender, EventArgs e)
         {
-            table.Add(new List<PictureBox>());
-
-            for (int i = 0; i < table[0].Count; i++)
+            for (int i = 0; i < 3; i++)
             {
-                PictureBox pictureBox = new PictureBox();
-                panel1.Controls.Add(pictureBox);
-                pictureBox.Size = new System.Drawing.Size(IMAGE_SIZE, IMAGE_SIZE);
-                pictureBox.Location = new Point(FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * i, FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * (table.Count - 1));
-                pictureBox.BorderStyle = BorderStyle.FixedSingle;
+                maps[i].Add(new List<PictureBox>());
 
-                table[table.Count - 1].Add(pictureBox);
+                for (int j = 0; j < maps[i][0].Count; j++)
+                {
+                    PictureBox pictureBox = new PictureBox();
+                    panels[i].Controls.Add(pictureBox);
+                    pictureBox.Size = new System.Drawing.Size(IMAGE_SIZE, IMAGE_SIZE);
+                    pictureBox.Location = new Point(FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * j, FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * (maps[i].Count - 1));
+                    pictureBox.BorderStyle = BorderStyle.FixedSingle;
+                    pictureBox.Click += new System.EventHandler(Cell_Click);
+
+                    maps[i][maps[i].Count - 1].Add(pictureBox);
+                }
             }
 
             buttonAddY.Location = new Point(buttonAddY.Location.X, buttonAddY.Location.Y + (IMAGE_SIZE + IMAGE_GAP));
@@ -84,33 +118,38 @@ namespace LevelEditor
 
         private void buttonRemoveX_Click(object sender, EventArgs e)
         {
-            if (table[0].Count == 1) return;
+            if (maps[0][0].Count == 1) return;
 
-            for (int i = 0; i < table.Count; i++)
+            for (int i = 0; i < 3; i++)
             {
-                panel1.Controls.Remove(table[i][table[i].Count - 1]);
-                table[i].RemoveAt(table[i].Count - 1);
+                for (int j = 0; j < maps[i].Count; j++)
+                {
+                    panels[i].Controls.Remove(maps[i][j][maps[i][j].Count - 1]);
+                    maps[i][j].RemoveAt(maps[i][j].Count - 1);
+                }
             }
-
             buttonAddX.Location = new Point(buttonAddX.Location.X - (IMAGE_SIZE + IMAGE_GAP), buttonAddX.Location.Y);
 
-            if (table[0].Count == 1) buttonRemoveX.Visible = false;
+            if (maps[0][0].Count == 1) buttonRemoveX.Visible = false;
             buttonRemoveX.Location = new Point(buttonRemoveX.Location.X - (IMAGE_SIZE + IMAGE_GAP), buttonRemoveX.Location.Y);
         }
 
         private void buttonRemoveY_Click(object sender, EventArgs e)
         {
-            if (table.Count == 1) return;
+            if (maps[0].Count == 1) return;
 
-            for (int i = 0; i < table[0].Count; i++)
+            for (int i = 0; i < 3; i++)
             {
-                panel1.Controls.Remove(table[table.Count - 1][i]);
+                for (int j = 0; j < maps[i][0].Count; j++)
+                {
+                    panels[i].Controls.Remove(maps[i][maps[i].Count - 1][j]);
+                }
+                maps[i].RemoveAt(maps[i].Count - 1);
             }
-            table.RemoveAt(table.Count - 1);
 
             buttonAddY.Location = new Point(buttonAddY.Location.X, buttonAddY.Location.Y - (IMAGE_SIZE + IMAGE_GAP));
 
-            if (table.Count == 1) buttonRemoveY.Visible = false;
+            if (maps[0].Count == 1) buttonRemoveY.Visible = false;
             buttonRemoveY.Location = new Point(buttonRemoveY.Location.X, buttonRemoveY.Location.Y - (IMAGE_SIZE + IMAGE_GAP));
         }
 
@@ -119,9 +158,21 @@ namespace LevelEditor
             // TODO: nacist mapu ze souboru
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private void Texture_Click(object sender, EventArgs e)
         {
-            // TODO: ukladani
+            textureBoxes[selectedTexture].BorderStyle = BorderStyle.None;
+
+            PictureBox pictureBox = (PictureBox)sender;
+
+            pictureBox.BorderStyle = BorderStyle.Fixed3D;
+
+            selectedTexture = textureBoxes.IndexOf(pictureBox);
+        }
+
+        private void Cell_Click(object sender, EventArgs e)
+        {
+            PictureBox pictureBox = (PictureBox)sender;
+            pictureBox.Image = new Bitmap(bitmaps[selectedTexture], new Size(64, 64));
         }
     }
 }
