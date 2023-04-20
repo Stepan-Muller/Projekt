@@ -25,7 +25,7 @@ namespace LevelEditor
 
         List<List<PictureBox>>[] mapsCells = new List<List<PictureBox>>[3];
 
-        List<Bitmap> bitmaps = new List<Bitmap>();
+        List<Bitmap> bitmaps;
 
         List<PictureBox> textureBoxes;
         int selectedTexture = 0;
@@ -38,13 +38,17 @@ namespace LevelEditor
             panels[1] = panel2;
             panels[2] = panel3;
 
+            mapsValues[0] = new List<List<int>>() { new List<int>() { 0 } };
+            mapsValues[1] = new List<List<int>>() { new List<int>() { 0 } };
+            mapsValues[2] = new List<List<int>>() { new List<int>() { 0 } };
+
             mapsCells[0] = new List<List<PictureBox>>() { new List<PictureBox>() { pictureBox1 } };
             mapsCells[1] = new List<List<PictureBox>>() { new List<PictureBox>() { pictureBox2 } };
             mapsCells[2] = new List<List<PictureBox>>() { new List<PictureBox>() { pictureBox3 } };
 
-            mapsValues[0] = new List<List<int>>() { new List<int>() { 0 } };
-            mapsValues[1] = new List<List<int>>() { new List<int>() { 0 } };
-            mapsValues[2] = new List<List<int>>() { new List<int>() { 0 } };
+            pictureBox1.Tag = new CellPosition(0, 0, 0);
+            pictureBox2.Tag = new CellPosition(1, 0, 0);
+            pictureBox3.Tag = new CellPosition(2, 0, 0);
 
             loadTextures();
         }
@@ -53,9 +57,15 @@ namespace LevelEditor
         {
             textureBoxes = new List<PictureBox>() { pictureBox4 };
 
-            for (int i = 0; i < Parser.getSize(16, 16, "../textures/textureMap.txt"); i++)
+            int count = Parser.parseInt("../textures/textureMap.txt", "count");
+            int width = Parser.parseInt("../textures/textureMap.txt", "width");
+            int height = Parser.parseInt("../textures/textureMap.txt", "height");
+
+            bitmaps = new List<Bitmap>();
+
+            for (int i = 0; i < count; i++)
             {
-                Bitmap bitmap = Parser.parsePicture(16, 16, "../textures/textureMap.txt", i);
+                Bitmap bitmap = Parser.parseBitmap(width, height, "../textures/textureMap.txt", "textureMap", i);
 
                 Bitmap resizedBitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
                 Graphics graphics = Graphics.FromImage(resizedBitmap);
@@ -88,104 +98,134 @@ namespace LevelEditor
                 fileTextBox.Text = "";
         }
 
-        private void buttonAddX_Click(object sender, EventArgs e)
+        private void addX(int num)
         {
-            for (int i = 0; i < 3; i++)
+            for (int n = 0; n < num; n++)
             {
-                for (int j = 0; j < mapsCells[i].Count; j++)
+                for (int i = 0; i < 3; i++)
                 {
-                    PictureBox pictureBox = new PictureBox();
-                    panels[i].Controls.Add(pictureBox);
-                    pictureBox.Size = new Size(IMAGE_SIZE, IMAGE_SIZE);
-                    pictureBox.Location = new Point(MAP_FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * (mapsCells[i][j].Count), MAP_FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * j);
-                    pictureBox.BorderStyle = BorderStyle.FixedSingle;
-                    pictureBox.Click += new EventHandler(Cell_Click);
+                    for (int j = 0; j < mapsCells[i].Count; j++)
+                    {
+                        PictureBox pictureBox = new PictureBox();
+                        panels[i].Controls.Add(pictureBox);
+                        pictureBox.Size = new Size(IMAGE_SIZE, IMAGE_SIZE);
+                        pictureBox.Location = new Point(MAP_FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * (mapsCells[i][j].Count), MAP_FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * j);
+                        pictureBox.BorderStyle = BorderStyle.FixedSingle;
+                        pictureBox.Tag = new CellPosition(i, mapsCells[i][j].Count, j);
+                        pictureBox.Click += new EventHandler(Cell_Click);
 
-                    mapsCells[i][j].Add(pictureBox);
+                        mapsCells[i][j].Add(pictureBox);
 
-                    mapsValues[i][j].Add(0);
+                        mapsValues[i][j].Add(0);
+                    }
                 }
             }
 
-            buttonAddX.Location = new Point(buttonAddX.Location.X + (IMAGE_SIZE + IMAGE_GAP), buttonAddX.Location.Y);
+            buttonAddX.Location = new Point(buttonAddX.Location.X + (IMAGE_SIZE + IMAGE_GAP) * num, buttonAddX.Location.Y);
 
-            buttonRemoveX.Location = new Point(buttonRemoveX.Location.X + (IMAGE_SIZE + IMAGE_GAP), buttonRemoveX.Location.Y);
+            buttonRemoveX.Location = new Point(buttonRemoveX.Location.X + (IMAGE_SIZE + IMAGE_GAP) * num, buttonRemoveX.Location.Y);
             buttonRemoveX.Visible = true;
+        }
+
+        private void addY(int num)
+        {
+            for (int n = 0; n < num; n++)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    mapsCells[i].Add(new List<PictureBox>());
+
+                    mapsValues[i].Add(new List<int>());
+
+                    for (int j = 0; j < mapsCells[i][0].Count; j++)
+                    {
+                        PictureBox pictureBox = new PictureBox();
+                        panels[i].Controls.Add(pictureBox);
+                        pictureBox.Size = new System.Drawing.Size(IMAGE_SIZE, IMAGE_SIZE);
+                        pictureBox.Location = new Point(MAP_FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * j, MAP_FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * (mapsCells[i].Count - 1));
+                        pictureBox.BorderStyle = BorderStyle.FixedSingle;
+                        pictureBox.Tag = new CellPosition(i, j, mapsCells[i].Count - 1);
+                        pictureBox.Click += new EventHandler(Cell_Click);
+
+                        mapsCells[i][mapsCells[i].Count - 1].Add(pictureBox);
+
+                        mapsValues[i][mapsCells[i].Count - 1].Add(0);
+                    }
+                }
+            }
+
+            buttonAddY.Location = new Point(buttonAddY.Location.X, buttonAddY.Location.Y + (IMAGE_SIZE + IMAGE_GAP) * num);
+
+            buttonRemoveY.Location = new Point(buttonRemoveY.Location.X, buttonRemoveY.Location.Y + (IMAGE_SIZE + IMAGE_GAP) * num);
+            buttonRemoveY.Visible = true;
+        }
+
+        private void removeX(int num)
+        {
+            if (mapsCells[0][0].Count == 1) return;
+
+            for (int n = 0; n < num; n++)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < mapsCells[i].Count; j++)
+                    {
+                        panels[i].Controls.Remove(mapsCells[i][j][mapsCells[i][j].Count - 1]);
+                        mapsCells[i][j].RemoveAt(mapsCells[i][j].Count - 1);
+
+                        mapsValues[i][j].RemoveAt(mapsValues[i][j].Count - 1);
+                    }
+                }
+            }
+
+            buttonAddX.Location = new Point(buttonAddX.Location.X - (IMAGE_SIZE + IMAGE_GAP) * num, buttonAddX.Location.Y);
+
+            if (mapsCells[0][0].Count == 1) buttonRemoveX.Visible = false;
+            buttonRemoveX.Location = new Point(buttonRemoveX.Location.X - (IMAGE_SIZE + IMAGE_GAP) * num, buttonRemoveX.Location.Y);
+        }
+
+        private void removeY(int num)
+        {
+            if (mapsCells[0].Count == 1) return;
+
+            for (int n = 0; n < num; n++)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < mapsCells[i][0].Count; j++)
+                    {
+                        panels[i].Controls.Remove(mapsCells[i][mapsCells[i].Count - 1][j]);
+                    }
+                    mapsCells[i].RemoveAt(mapsCells[i].Count - 1);
+
+                    mapsValues[i].RemoveAt(mapsValues[i].Count - 1);
+                }
+            }
+
+            buttonAddY.Location = new Point(buttonAddY.Location.X, buttonAddY.Location.Y - (IMAGE_SIZE + IMAGE_GAP) * num);
+
+            if (mapsCells[0].Count == 1) buttonRemoveY.Visible = false;
+            buttonRemoveY.Location = new Point(buttonRemoveY.Location.X, buttonRemoveY.Location.Y - (IMAGE_SIZE + IMAGE_GAP) * num);
+        }
+
+        private void buttonAddX_Click(object sender, EventArgs e)
+        {
+            addX(1);
         }
 
         private void buttonAddY_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 3; i++)
-            {
-                mapsCells[i].Add(new List<PictureBox>());
-
-                mapsValues[i].Add(new List<int>());
-
-                for (int j = 0; j < mapsCells[i][0].Count; j++)
-                {
-                    PictureBox pictureBox = new PictureBox();
-                    panels[i].Controls.Add(pictureBox);
-                    pictureBox.Size = new System.Drawing.Size(IMAGE_SIZE, IMAGE_SIZE);
-                    pictureBox.Location = new Point(MAP_FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * j, MAP_FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * (mapsCells[i].Count - 1));
-                    pictureBox.BorderStyle = BorderStyle.FixedSingle;
-                    pictureBox.Click += new EventHandler(Cell_Click);
-
-                    mapsCells[i][mapsCells[i].Count - 1].Add(pictureBox);
-
-                    mapsValues[i][mapsCells[i].Count - 1].Add(0);
-                }
-            }
-
-            buttonAddY.Location = new Point(buttonAddY.Location.X, buttonAddY.Location.Y + (IMAGE_SIZE + IMAGE_GAP));
-
-            buttonRemoveY.Location = new Point(buttonRemoveY.Location.X, buttonRemoveY.Location.Y + (IMAGE_SIZE + IMAGE_GAP));
-            buttonRemoveY.Visible = true;
+            addY(1);
         }
 
         private void buttonRemoveX_Click(object sender, EventArgs e)
         {
-            if (mapsCells[0][0].Count == 1) return;
-
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < mapsCells[i].Count; j++)
-                {
-                    panels[i].Controls.Remove(mapsCells[i][j][mapsCells[i][j].Count - 1]);
-                    mapsCells[i][j].RemoveAt(mapsCells[i][j].Count - 1);
-
-                    mapsValues[i][j].RemoveAt(mapsValues[i][j].Count - 1);
-                }
-            }
-            buttonAddX.Location = new Point(buttonAddX.Location.X - (IMAGE_SIZE + IMAGE_GAP), buttonAddX.Location.Y);
-
-            if (mapsCells[0][0].Count == 1) buttonRemoveX.Visible = false;
-            buttonRemoveX.Location = new Point(buttonRemoveX.Location.X - (IMAGE_SIZE + IMAGE_GAP), buttonRemoveX.Location.Y);
+            removeX(1);
         }
 
         private void buttonRemoveY_Click(object sender, EventArgs e)
         {
-            if (mapsCells[0].Count == 1) return;
-
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < mapsCells[i][0].Count; j++)
-                {
-                    panels[i].Controls.Remove(mapsCells[i][mapsCells[i].Count - 1][j]);
-                }
-                mapsCells[i].RemoveAt(mapsCells[i].Count - 1);
-
-                mapsValues[i].RemoveAt(mapsValues[i].Count - 1);
-            }
-
-            buttonAddY.Location = new Point(buttonAddY.Location.X, buttonAddY.Location.Y - (IMAGE_SIZE + IMAGE_GAP));
-
-            if (mapsCells[0].Count == 1) buttonRemoveY.Visible = false;
-            buttonRemoveY.Location = new Point(buttonRemoveY.Location.X, buttonRemoveY.Location.Y - (IMAGE_SIZE + IMAGE_GAP));
-        }
-
-        private void fileTextBox_TextChanged(object sender, EventArgs e)
-        {
-            // TODO: nacist mapu ze souboru
+            removeY(1);
         }
 
         private void Texture_Click(object sender, EventArgs e)
@@ -203,6 +243,7 @@ namespace LevelEditor
         {
             PictureBox pictureBox = (PictureBox)sender;
 
+            // Renderovani
             if (selectedTexture > 0)
             {
                 Bitmap bitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
@@ -215,11 +256,76 @@ namespace LevelEditor
                 pictureBox.Image = bitmap;
             }
             else pictureBox.Image = new Bitmap(1, 1);
+
+            // Upraveni pole hodnot na pozadi
+            CellPosition cellPosition = (CellPosition)pictureBox.Tag;
+
+            mapsValues[cellPosition.mapIndex][cellPosition.y][cellPosition.x] = selectedTexture;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void setSize(int width, int height)
         {
+            if (width < mapsCells[0][0].Count)
+                removeX(mapsCells[0][0].Count - width);
+            if (height < mapsCells[0].Count)
+                removeY(mapsCells[0].Count - height);
 
+            for (int i = 0; i < 3; i++)
+            {
+                for (int x = 0; x < mapsCells[0].Count; x++)
+                {
+                    for (int y = 0; y < mapsCells[0][0].Count; y++)
+                    {
+                        mapsCells[i][x][y].Image = new Bitmap(1, 1);
+                        mapsValues[i][x][y] = 0;
+                    }
+                }
+            }
+
+            if (width > mapsCells[0][0].Count)
+                addX(width - mapsCells[0][0].Count);
+            if (height > mapsCells[0].Count)
+                addY(height - mapsCells[0].Count);
+        }
+
+        private void loadMap(int[] map, int mapIndex, int width, int height)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (map[y * width + x] > 0)
+                    {
+                        Bitmap bitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
+
+                        // Zvetsit obrazek
+                        Graphics graphics = Graphics.FromImage(bitmap);
+                        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                        graphics.DrawImage(bitmaps[map[y * width + x] - 1], 0, 0, IMAGE_SIZE, IMAGE_SIZE);
+
+                        mapsCells[mapIndex][x][y].Image = bitmap;
+                    }
+                    else mapsCells[mapIndex][x][y].Image = new Bitmap(1, 1);
+
+                    mapsValues[mapIndex][x][y] = map[y * width + x];
+                }
+            }
+        }
+
+        private void loadButton_Click(object sender, EventArgs e)
+        {
+            fillDock.Visible = false;
+            
+            int width = Parser.parseInt(fileTextBox.Text, "width");
+            int height = Parser.parseInt(fileTextBox.Text, "height");
+
+            setSize(width, height);
+
+            loadMap(Parser.parseIntArray(fileTextBox.Text, "mapWalls", width * height), 0, width, height);
+            loadMap(Parser.parseIntArray(fileTextBox.Text, "mapFloors", width * height), 1, width, height);
+            loadMap(Parser.parseIntArray(fileTextBox.Text, "mapCeilings", width * height), 2, width, height);
+
+            fillDock.Visible = true;
         }
     }
 }

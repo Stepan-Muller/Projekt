@@ -10,32 +10,70 @@ namespace LevelEditor
 {
     class Parser
     {
-        public static int getSize(int width, int height, string path)
+        static int getIndexOf(string[] words, string valueName)
+        {
+            int i = 0;
+            while (true)
+            {
+                if (words[i] == "#")
+                {
+                    i++;
+                    Console.WriteLine(words[i]);
+                    if (words[i] == valueName)
+                        return i + 1;
+                }
+
+                i++;
+            }
+        }
+        
+        public static int parseInt(string path, string valueName)
         {
             string text = File.ReadAllText(path);
-            string[] bits = text.Split(' ', '\n');
+            string[] words = text.Split(' ', '\n');
 
-            return bits.Length / width / height / 3;
+            return int.Parse(words[getIndexOf(words, valueName)]);
         }
 
-        public static Bitmap parsePicture(int width, int height, string path, int index)
+        public static string parseString(string path, string valueName)
         {
-            Bitmap bitmap = new Bitmap(width, height);
-
-            int starterIndex = index * width * height * 3;
-
             string text = File.ReadAllText(path);
-            string[] bits = text.Split(' ', '\n');
+            string[] words = text.Split(' ', '\n');
+
+            return words[getIndexOf(words, valueName)];
+        }
+
+        public static int[] parseIntArray(string path, string valueName, int size)
+        {
+            string text = File.ReadAllText(path);
+            string[] words = text.Split(' ', '\n');
+
+            int starterIndex = getIndexOf(words, valueName);
+            int[] array = new int[size];
+
+            for (int j = 0; j < size; j++)
+                array[j] = int.Parse(words[starterIndex + j]);
+
+            return array;
+        }
+
+        public static Bitmap parseBitmap(int width, int height, string path, string valueName, int index)
+        {
+            string text = File.ReadAllText(path);
+            string[] words = text.Split(' ', '\n');
+
+            int starterIndex = getIndexOf(words, valueName) + index * width * height * 3;
+            Bitmap bitmap = new Bitmap(width, height);
 
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                 {
-                    int red = int.Parse(bits[starterIndex + x * 3 + y * 3 * width]);
-                    int green = int.Parse(bits[starterIndex + x * 3 + y * 3 * width + 1]);
-                    int blue = int.Parse(bits[starterIndex + x * 3 + y * 3 * width + 2]);
+                    int red = int.Parse(words[starterIndex + x * 3 + y * 3 * width]);
+                    int green = int.Parse(words[starterIndex + x * 3 + y * 3 * width + 1]);
+                    int blue = int.Parse(words[starterIndex + x * 3 + y * 3 * width + 2]);
 
                     bitmap.SetPixel(x, y, Color.FromArgb(red, green, blue));
-                }        
+                }
 
             return bitmap;
         }

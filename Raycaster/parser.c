@@ -19,10 +19,10 @@ static void skipUntil(FILE* file, char* valueName)
     }
 }
 
-static void parseInt(char* fileName, char* valueName, int* output)
+static void parseInt(char* path, char* valueName, int* output)
 {
     FILE* file;
-    errno_t error = fopen_s(&file, fileName, "r");
+    errno_t error = fopen_s(&file, path, "r");
 
     if (error)
         return;
@@ -34,10 +34,10 @@ static void parseInt(char* fileName, char* valueName, int* output)
     fclose(file);
 }
 
-static void parseString(char* fileName, char* valueName, char* output, int maxLength)
+static void parseString(char* path, char* valueName, char* output, int maxLength)
 {
     FILE* file;
-    errno_t error = fopen_s(&file, fileName, "r");
+    errno_t error = fopen_s(&file, path, "r");
 
     if (error)
         return;
@@ -49,10 +49,10 @@ static void parseString(char* fileName, char* valueName, char* output, int maxLe
     fclose(file);
 }
 
-static void parseIntArray(char* fileName, char* valueName, int* output, int size)
+static void parseIntArray(char* path, char* valueName, int* output, int size)
 {
     FILE* file;
-    errno_t error = fopen_s(&file, fileName, "r");
+    errno_t error = fopen_s(&file, path, "r");
 
     if (error)
         return;
