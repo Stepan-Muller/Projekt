@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -84,20 +85,6 @@ namespace LevelEditor
             }
         }
 
-        private void browseButton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Title = "Vyberte soubor";
-            openFileDialog.InitialDirectory = Application.StartupPath + @"\..";
-            openFileDialog.Filter = "Text File (*.txt)|*.txt";
-            openFileDialog.ShowDialog();
-
-            if (openFileDialog.FileName != "")
-                fileTextBox.Text = openFileDialog.FileName;
-            else
-                fileTextBox.Text = "";
-        }
-
         private void addX(int num)
         {
             for (int n = 0; n < num; n++)
@@ -112,7 +99,7 @@ namespace LevelEditor
                         pictureBox.Location = new Point(MAP_FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * (mapsCells[i][j].Count), MAP_FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * j);
                         pictureBox.BorderStyle = BorderStyle.FixedSingle;
                         pictureBox.Tag = new CellPosition(i, mapsCells[i][j].Count, j);
-                        pictureBox.Click += new EventHandler(Cell_Click);
+                        pictureBox.MouseMove += new MouseEventHandler(Cell_MouseMove);
 
                         mapsCells[i][j].Add(pictureBox);
 
@@ -145,7 +132,7 @@ namespace LevelEditor
                         pictureBox.Location = new Point(MAP_FIRST_IMAGE_X + (IMAGE_SIZE + IMAGE_GAP) * j, MAP_FIRST_IMAGE_Y + (IMAGE_SIZE + IMAGE_GAP) * (mapsCells[i].Count - 1));
                         pictureBox.BorderStyle = BorderStyle.FixedSingle;
                         pictureBox.Tag = new CellPosition(i, j, mapsCells[i].Count - 1);
-                        pictureBox.Click += new EventHandler(Cell_Click);
+                        pictureBox.MouseMove += new MouseEventHandler(Cell_MouseMove);
 
                         mapsCells[i][mapsCells[i].Count - 1].Add(pictureBox);
 
@@ -239,28 +226,34 @@ namespace LevelEditor
             selectedTexture = textureBoxes.IndexOf(pictureBox);
         }
 
-        private void Cell_Click(object sender, EventArgs e)
+        private void Cell_MouseMove(object sender, MouseEventArgs e)
         {
-            PictureBox pictureBox = (PictureBox)sender;
-
-            // Renderovani
-            if (selectedTexture > 0)
+            if (MouseButtons == MouseButtons.Left)
             {
-                Bitmap bitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
+                Control control = (Control) sender;
+                control.Capture = false;
+                
+                PictureBox pictureBox = (PictureBox)sender;
 
-                // Zvetsit obrazek
-                Graphics graphics = Graphics.FromImage(bitmap);
-                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                graphics.DrawImage(bitmaps[selectedTexture - 1], 0, 0, IMAGE_SIZE, IMAGE_SIZE);
+                // Renderovani
+                if (selectedTexture > 0)
+                {
+                    Bitmap bitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
 
-                pictureBox.Image = bitmap;
+                    // Zvetsit obrazek
+                    Graphics graphics = Graphics.FromImage(bitmap);
+                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    graphics.DrawImage(bitmaps[selectedTexture - 1], 0, 0, IMAGE_SIZE, IMAGE_SIZE);
+
+                    pictureBox.Image = bitmap;
+                }
+                else pictureBox.Image = new Bitmap(1, 1);
+
+                // Upraveni pole hodnot na pozadi
+                CellPosition cellPosition = (CellPosition)pictureBox.Tag;
+
+                mapsValues[cellPosition.mapIndex][cellPosition.y][cellPosition.x] = selectedTexture;
             }
-            else pictureBox.Image = new Bitmap(1, 1);
-
-            // Upraveni pole hodnot na pozadi
-            CellPosition cellPosition = (CellPosition)pictureBox.Tag;
-
-            mapsValues[cellPosition.mapIndex][cellPosition.y][cellPosition.x] = selectedTexture;
         }
 
         private void setSize(int width, int height)
@@ -312,20 +305,63 @@ namespace LevelEditor
             }
         }
 
+        private void getFile(bool exists = true)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Vyberte soubor";
+            openFileDialog.InitialDirectory = Application.StartupPath + @"\..";
+            openFileDialog.Filter = "Text File (*.txt)|*.txt";
+            if (!exists) openFileDialog.CheckFileExists = false;
+            openFileDialog.ShowDialog();
+
+            fileName.Text = openFileDialog.FileName;
+        }
+
         private void loadButton_Click(object sender, EventArgs e)
         {
+            while (!File.Exists(fileName.Text)) getFile();
+            
             fillDock.Visible = false;
             
-            int width = Parser.parseInt(fileTextBox.Text, "width");
-            int height = Parser.parseInt(fileTextBox.Text, "height");
+            int width = Parser.parseInt(fileName.Text, "width");
+            int height = Parser.parseInt(fileName.Text, "height");
 
             setSize(width, height);
 
-            loadMap(Parser.parseIntArray(fileTextBox.Text, "mapWalls", width * height), 0, width, height);
-            loadMap(Parser.parseIntArray(fileTextBox.Text, "mapFloors", width * height), 1, width, height);
-            loadMap(Parser.parseIntArray(fileTextBox.Text, "mapCeilings", width * height), 2, width, height);
+            loadMap(Parser.parseIntArray(fileName.Text, "mapWalls", width * height), 0, width, height);
+            loadMap(Parser.parseIntArray(fileName.Text, "mapFloors", width * height), 1, width, height);
+            loadMap(Parser.parseIntArray(fileName.Text, "mapCeilings", width * height), 2, width, height);
+
+            
 
             fillDock.Visible = true;
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            while (fileName.Text == "") getFile(false);
+            
+            File.WriteAllText(fileName.Text, "");
+
+            Parser.writeValue(fileName.Text, "width", mapsValues[0].Count.ToString());
+            Parser.writeValue(fileName.Text, "height", mapsValues[0][0].Count.ToString());
+
+            File.AppendAllText(fileName.Text, "\n");
+
+            /* TODO: dalsi hodnoty levelu */ 
+
+            Parser.write2DArray(fileName.Text, "mapWalls", mapsValues[0].Select(list => list.ToArray()).ToArray());
+            File.AppendAllText(fileName.Text, "\n");
+            Parser.write2DArray(fileName.Text, "mapFloors", mapsValues[1].Select(list => list.ToArray()).ToArray());
+            File.AppendAllText(fileName.Text, "\n");
+            Parser.write2DArray(fileName.Text, "mapCeilings", mapsValues[2].Select(list => list.ToArray()).ToArray());
+        }
+
+        private void saveAsButton_Click(object sender, EventArgs e)
+        {
+            fileName.Text = "";
+
+            saveButton_Click(sender, e);
         }
     }
 }

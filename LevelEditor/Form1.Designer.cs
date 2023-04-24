@@ -1,4 +1,6 @@
-﻿namespace LevelEditor
+﻿using System.Windows.Forms;
+
+namespace LevelEditor
 {
     partial class Form1
     {
@@ -28,8 +30,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.fileTextBox = new System.Windows.Forms.TextBox();
-            this.browseButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.buttonRemoveX = new System.Windows.Forms.Button();
@@ -50,6 +50,8 @@
             this.fillDock = new System.Windows.Forms.Panel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.saveAsButton = new System.Windows.Forms.Button();
+            this.fileName = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.flowLayoutPanel2.SuspendLayout();
@@ -62,28 +64,6 @@
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             this.SuspendLayout();
-            // 
-            // fileTextBox
-            // 
-            this.fileTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.fileTextBox.Location = new System.Drawing.Point(18, 18);
-            this.fileTextBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.fileTextBox.Name = "fileTextBox";
-            this.fileTextBox.Size = new System.Drawing.Size(1385, 26);
-            this.fileTextBox.TabIndex = 0;
-            // 
-            // browseButton
-            // 
-            this.browseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseButton.Location = new System.Drawing.Point(1411, 13);
-            this.browseButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.browseButton.Name = "browseButton";
-            this.browseButton.Size = new System.Drawing.Size(112, 35);
-            this.browseButton.TabIndex = 1;
-            this.browseButton.Text = "Procházet ...";
-            this.browseButton.UseVisualStyleBackColor = true;
-            this.browseButton.Click += new System.EventHandler(this.browseButton_Click);
             // 
             // panel1
             // 
@@ -134,7 +114,7 @@
             this.pictureBox1.Size = new System.Drawing.Size(95, 97);
             this.pictureBox1.TabIndex = 2;
             this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.Cell_Click);
+            this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
             // 
             // buttonRemoveY
             // 
@@ -222,7 +202,7 @@
             this.pictureBox2.Size = new System.Drawing.Size(95, 97);
             this.pictureBox2.TabIndex = 2;
             this.pictureBox2.TabStop = false;
-            this.pictureBox2.Click += new System.EventHandler(this.Cell_Click);
+            this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
             // 
             // panel3
             // 
@@ -255,14 +235,14 @@
             this.pictureBox3.Size = new System.Drawing.Size(95, 97);
             this.pictureBox3.TabIndex = 2;
             this.pictureBox3.TabStop = false;
-            this.pictureBox3.Click += new System.EventHandler(this.Cell_Click);
+            this.pictureBox3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
             // 
             // topDock
             // 
+            this.topDock.Controls.Add(this.fileName);
+            this.topDock.Controls.Add(this.saveAsButton);
             this.topDock.Controls.Add(this.saveButton);
             this.topDock.Controls.Add(this.loadButton);
-            this.topDock.Controls.Add(this.fileTextBox);
-            this.topDock.Controls.Add(this.browseButton);
             this.topDock.Dock = System.Windows.Forms.DockStyle.Top;
             this.topDock.Location = new System.Drawing.Point(0, 0);
             this.topDock.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -273,18 +253,19 @@
             // saveButton
             // 
             this.saveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveButton.Location = new System.Drawing.Point(1771, 13);
+            this.saveButton.Location = new System.Drawing.Point(1651, 13);
             this.saveButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(112, 35);
             this.saveButton.TabIndex = 3;
             this.saveButton.Text = "Uložit";
             this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
             // loadButton
             // 
             this.loadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.loadButton.Location = new System.Drawing.Point(1651, 13);
+            this.loadButton.Location = new System.Drawing.Point(1531, 13);
             this.loadButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.loadButton.Name = "loadButton";
             this.loadButton.Size = new System.Drawing.Size(112, 35);
@@ -328,6 +309,27 @@
             this.pictureBox4.TabStop = false;
             this.pictureBox4.Click += new System.EventHandler(this.Texture_Click);
             // 
+            // saveAsButton
+            // 
+            this.saveAsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.saveAsButton.Location = new System.Drawing.Point(1771, 13);
+            this.saveAsButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.saveAsButton.Name = "saveAsButton";
+            this.saveAsButton.Size = new System.Drawing.Size(112, 35);
+            this.saveAsButton.TabIndex = 4;
+            this.saveAsButton.Text = "Uložit jako...";
+            this.saveAsButton.UseVisualStyleBackColor = true;
+            this.saveAsButton.Click += new System.EventHandler(this.saveAsButton_Click);
+            // 
+            // fileName
+            // 
+            this.fileName.AutoSize = true;
+            this.fileName.Location = new System.Drawing.Point(18, 20);
+            this.fileName.Name = "fileName";
+            this.fileName.Size = new System.Drawing.Size(99, 20);
+            this.fileName.TabIndex = 5;
+            this.fileName.Text = "Nový Soubor";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -358,9 +360,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox fileTextBox;
-        private System.Windows.Forms.Button browseButton;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
@@ -381,6 +380,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.Button loadButton;
+        private System.Windows.Forms.Label fileName;
+        private System.Windows.Forms.Button saveAsButton;
     }
 }
 
