@@ -10,9 +10,6 @@
 #include "util.c"
 #include "parser.c"
 
-#include "../textures/textureMap.ppm"
-#include "../textures/skyBox.ppm"
-
 /* Konstanty */
 #define RENDER_DISTANCE 8
 #define PLAYER_SIZE 0.3 // velikost hrace v pixelech
@@ -28,7 +25,7 @@ float turnSensitivity = 0.002;
 
 /* Globalni promenne */
 bool debug = false, menu = false, resetMouse = false;
-int mapWidth, mapHeight, playerSpawnX, playerSpawnY, * mapWalls, * mapFloors, * mapCeilings, screenWidth, screenHeight;
+int mapWidth, mapHeight, playerSpawnX, playerSpawnY, * mapWalls, * mapFloors, * mapCeilings, screenWidth, screenHeight, * textureMap;
 char* nextLevel[20];
 float playerX, playerY, playerDeltaX, playerDeltaY, playerAngle, deltaTime;
 
@@ -39,6 +36,19 @@ static void respawn()
     playerAngle = 0;
     playerDeltaX = cos(playerAngle);
     playerDeltaY = sin(playerAngle);
+}
+
+static void loadTextureMap()
+{
+    int count = 0, width = 0, height = 0;
+    parseInt("../textures/textureMap.txt", "count", &count);
+    parseInt("../textures/textureMap.txt", "width", &width);
+    parseInt("../textures/textureMap.txt", "height", &height);
+
+    int textureMapSize = count * width * height * 3;
+
+    textureMap = (int*)malloc(textureMapSize * sizeof(int));
+    parseIntArray("../textures/textureMap.txt", "textureMap", textureMap, textureMapSize);
 }
 
 static void loadMap(char* name)
@@ -73,6 +83,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
         debug = !debug;
+    if (key == GLFW_KEY_F4 && action == GLFW_PRESS)
+        loadTextureMap();
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
         menu = !menu;
@@ -534,7 +546,16 @@ void draw3D()
 
 void drawSky()
 {
-    int scale = screenHeight / 160;
+    int width = 0, height = 0;
+    parseInt("../textures/skyBox.txt", "width", &width);
+    parseInt("../textures/skyBox.txt", "height", &height);
+
+    int skyBoxSize = width * height * 3;
+
+    int* skyBox = (int*)malloc(skyBoxSize * sizeof(int));
+    parseIntArray("../textures/skyBox.txt", "skyBox", skyBox, skyBoxSize);
+    
+    int scale = screenHeight / (height * 2);
     
     glPointSize(scale + 1);
     glBegin(GL_POINTS);
@@ -543,9 +564,9 @@ void drawSky()
     {
         for (int x = 0; x < screenWidth / scale; x++)
         {
-            int red = skyBox[((int)y * 120 + (int)(x + playerAngle * 240) % 120) * 3];
-            int green = skyBox[((int)y * 120 + (int)(x + playerAngle * 240) % 120) * 3 + 1];
-            int blue = skyBox[((int)y * 120 + (int)(x + playerAngle * 240) % 120) * 3 + 2];
+            int red = skyBox[((int)y * width + (int)(x + playerAngle * 240) % width) * 3];
+            int green = skyBox[((int)y * width + (int)(x + playerAngle * 240) % width) * 3 + 1];
+            int blue = skyBox[((int)y * width + (int)(x + playerAngle * 240) % width) * 3 + 2];
 
             glColor3ub(red, green, blue);
             glVertex2i(x * (scale + 1), y * (scale + 1));
@@ -588,7 +609,9 @@ int WinMain(void)
 
     float lastTime = glfwGetTime();
 
-    loadMap("../levels/map_1.txt");
+    loadTextureMap();
+
+    loadMap("../levels/map_2.txt");
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
