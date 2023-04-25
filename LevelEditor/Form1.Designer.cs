@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace LevelEditor
 {
@@ -45,13 +46,13 @@ namespace LevelEditor
             this.label3 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.topDock = new System.Windows.Forms.Panel();
+            this.fileNameLabel = new System.Windows.Forms.Label();
+            this.saveAsButton = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.loadButton = new System.Windows.Forms.Button();
             this.fillDock = new System.Windows.Forms.Panel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
-            this.saveAsButton = new System.Windows.Forms.Button();
-            this.fileName = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.flowLayoutPanel2.SuspendLayout();
@@ -75,19 +76,17 @@ namespace LevelEditor
             this.panel1.Controls.Add(this.buttonRemoveY);
             this.panel1.Controls.Add(this.buttonAddX);
             this.panel1.Controls.Add(this.buttonAddY);
-            this.panel1.Location = new System.Drawing.Point(4, 5);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(157, 162);
+            this.panel1.Size = new System.Drawing.Size(73, 73);
             this.panel1.TabIndex = 8;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(56, 29);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(0, 19);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(47, 20);
+            this.label1.Size = new System.Drawing.Size(33, 13);
             this.label1.TabIndex = 7;
             this.label1.Text = "Walls";
             // 
@@ -95,10 +94,9 @@ namespace LevelEditor
             // 
             this.buttonRemoveX.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.buttonRemoveX.ForeColor = System.Drawing.Color.Red;
-            this.buttonRemoveX.Location = new System.Drawing.Point(57, 0);
-            this.buttonRemoveX.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonRemoveX.Location = new System.Drawing.Point(6, 0);
             this.buttonRemoveX.Name = "buttonRemoveX";
-            this.buttonRemoveX.Size = new System.Drawing.Size(48, 49);
+            this.buttonRemoveX.Size = new System.Drawing.Size(32, 32);
             this.buttonRemoveX.TabIndex = 5;
             this.buttonRemoveX.Text = "-";
             this.buttonRemoveX.UseVisualStyleBackColor = true;
@@ -108,22 +106,21 @@ namespace LevelEditor
             // pictureBox1
             // 
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox1.Location = new System.Drawing.Point(57, 58);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pictureBox1.Location = new System.Drawing.Point(38, 38);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(95, 97);
+            this.pictureBox1.Size = new System.Drawing.Size(32, 32);
             this.pictureBox1.TabIndex = 2;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.Cell_Click);
             this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
             // 
             // buttonRemoveY
             // 
             this.buttonRemoveY.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.buttonRemoveY.ForeColor = System.Drawing.Color.Red;
-            this.buttonRemoveY.Location = new System.Drawing.Point(0, 58);
-            this.buttonRemoveY.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonRemoveY.Location = new System.Drawing.Point(0, 6);
             this.buttonRemoveY.Name = "buttonRemoveY";
-            this.buttonRemoveY.Size = new System.Drawing.Size(48, 49);
+            this.buttonRemoveY.Size = new System.Drawing.Size(32, 32);
             this.buttonRemoveY.TabIndex = 6;
             this.buttonRemoveY.Text = "-";
             this.buttonRemoveY.UseVisualStyleBackColor = true;
@@ -134,10 +131,9 @@ namespace LevelEditor
             // 
             this.buttonAddX.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.buttonAddX.ForeColor = System.Drawing.Color.Green;
-            this.buttonAddX.Location = new System.Drawing.Point(105, 0);
-            this.buttonAddX.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonAddX.Location = new System.Drawing.Point(38, 0);
             this.buttonAddX.Name = "buttonAddX";
-            this.buttonAddX.Size = new System.Drawing.Size(48, 49);
+            this.buttonAddX.Size = new System.Drawing.Size(32, 32);
             this.buttonAddX.TabIndex = 3;
             this.buttonAddX.Text = "+";
             this.buttonAddX.UseVisualStyleBackColor = true;
@@ -147,10 +143,9 @@ namespace LevelEditor
             // 
             this.buttonAddY.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.buttonAddY.ForeColor = System.Drawing.Color.Green;
-            this.buttonAddY.Location = new System.Drawing.Point(0, 108);
-            this.buttonAddY.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonAddY.Location = new System.Drawing.Point(0, 38);
             this.buttonAddY.Name = "buttonAddY";
-            this.buttonAddY.Size = new System.Drawing.Size(48, 49);
+            this.buttonAddY.Size = new System.Drawing.Size(32, 32);
             this.buttonAddY.TabIndex = 4;
             this.buttonAddY.Text = "+";
             this.buttonAddY.UseVisualStyleBackColor = true;
@@ -165,10 +160,9 @@ namespace LevelEditor
             this.flowLayoutPanel2.Controls.Add(this.panel1);
             this.flowLayoutPanel2.Controls.Add(this.panel2);
             this.flowLayoutPanel2.Controls.Add(this.panel3);
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(18, 126);
-            this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(12, 50);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(1860, 846);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(1240, 581);
             this.flowLayoutPanel2.TabIndex = 9;
             // 
             // panel2
@@ -177,31 +171,29 @@ namespace LevelEditor
             this.panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.pictureBox2);
-            this.panel2.Location = new System.Drawing.Point(169, 5);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panel2.Location = new System.Drawing.Point(82, 3);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(156, 160);
+            this.panel2.Size = new System.Drawing.Size(73, 73);
             this.panel2.TabIndex = 9;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(52, 29);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(0, 19);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 20);
+            this.label2.Size = new System.Drawing.Size(35, 13);
             this.label2.TabIndex = 8;
             this.label2.Text = "Floors";
             // 
             // pictureBox2
             // 
             this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox2.Location = new System.Drawing.Point(57, 58);
-            this.pictureBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pictureBox2.Location = new System.Drawing.Point(38, 38);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(95, 97);
+            this.pictureBox2.Size = new System.Drawing.Size(32, 32);
             this.pictureBox2.TabIndex = 2;
             this.pictureBox2.TabStop = false;
+            this.pictureBox2.Click += new System.EventHandler(this.Cell_Click);
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
             // 
             // panel3
@@ -210,53 +202,70 @@ namespace LevelEditor
             this.panel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel3.Controls.Add(this.label3);
             this.panel3.Controls.Add(this.pictureBox3);
-            this.panel3.Location = new System.Drawing.Point(333, 5);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panel3.Location = new System.Drawing.Point(161, 3);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(156, 160);
+            this.panel3.Size = new System.Drawing.Size(73, 73);
             this.panel3.TabIndex = 10;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(52, 29);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Location = new System.Drawing.Point(0, 19);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(64, 20);
+            this.label3.Size = new System.Drawing.Size(43, 13);
             this.label3.TabIndex = 9;
             this.label3.Text = "Ceilings";
             // 
             // pictureBox3
             // 
             this.pictureBox3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox3.Location = new System.Drawing.Point(57, 58);
-            this.pictureBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pictureBox3.Location = new System.Drawing.Point(38, 38);
             this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(95, 97);
+            this.pictureBox3.Size = new System.Drawing.Size(32, 32);
             this.pictureBox3.TabIndex = 2;
             this.pictureBox3.TabStop = false;
+            this.pictureBox3.Click += new System.EventHandler(this.Cell_Click);
             this.pictureBox3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
             // 
             // topDock
             // 
-            this.topDock.Controls.Add(this.fileName);
+            this.topDock.Controls.Add(this.fileNameLabel);
             this.topDock.Controls.Add(this.saveAsButton);
             this.topDock.Controls.Add(this.saveButton);
             this.topDock.Controls.Add(this.loadButton);
             this.topDock.Dock = System.Windows.Forms.DockStyle.Top;
             this.topDock.Location = new System.Drawing.Point(0, 0);
-            this.topDock.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.topDock.Name = "topDock";
-            this.topDock.Size = new System.Drawing.Size(1896, 58);
+            this.topDock.Size = new System.Drawing.Size(1264, 38);
             this.topDock.TabIndex = 10;
+            // 
+            // fileNameLabel
+            // 
+            this.fileNameLabel.AutoSize = true;
+            this.fileNameLabel.Location = new System.Drawing.Point(12, 13);
+            this.fileNameLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.fileNameLabel.Name = "fileNameLabel";
+            this.fileNameLabel.Size = new System.Drawing.Size(69, 13);
+            this.fileNameLabel.TabIndex = 5;
+            this.fileNameLabel.Text = "Nový Soubor";
+            // 
+            // saveAsButton
+            // 
+            this.saveAsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.saveAsButton.Location = new System.Drawing.Point(1181, 8);
+            this.saveAsButton.Name = "saveAsButton";
+            this.saveAsButton.Size = new System.Drawing.Size(75, 23);
+            this.saveAsButton.TabIndex = 4;
+            this.saveAsButton.Text = "Uložit jako...";
+            this.saveAsButton.UseVisualStyleBackColor = true;
+            this.saveAsButton.Click += new System.EventHandler(this.saveAsButton_Click);
             // 
             // saveButton
             // 
             this.saveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveButton.Location = new System.Drawing.Point(1651, 13);
-            this.saveButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.saveButton.Location = new System.Drawing.Point(1101, 8);
             this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(112, 35);
+            this.saveButton.Size = new System.Drawing.Size(75, 23);
             this.saveButton.TabIndex = 3;
             this.saveButton.Text = "Uložit";
             this.saveButton.UseVisualStyleBackColor = true;
@@ -265,10 +274,9 @@ namespace LevelEditor
             // loadButton
             // 
             this.loadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.loadButton.Location = new System.Drawing.Point(1531, 13);
-            this.loadButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.loadButton.Location = new System.Drawing.Point(1021, 8);
             this.loadButton.Name = "loadButton";
-            this.loadButton.Size = new System.Drawing.Size(112, 35);
+            this.loadButton.Size = new System.Drawing.Size(75, 23);
             this.loadButton.TabIndex = 2;
             this.loadButton.Text = "Načíst";
             this.loadButton.UseVisualStyleBackColor = true;
@@ -279,10 +287,9 @@ namespace LevelEditor
             this.fillDock.Controls.Add(this.flowLayoutPanel1);
             this.fillDock.Controls.Add(this.flowLayoutPanel2);
             this.fillDock.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fillDock.Location = new System.Drawing.Point(0, 58);
-            this.fillDock.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.fillDock.Location = new System.Drawing.Point(0, 38);
             this.fillDock.Name = "fillDock";
-            this.fillDock.Size = new System.Drawing.Size(1896, 990);
+            this.fillDock.Size = new System.Drawing.Size(1264, 643);
             this.fillDock.TabIndex = 11;
             // 
             // flowLayoutPanel1
@@ -291,52 +298,30 @@ namespace LevelEditor
             | System.Windows.Forms.AnchorStyles.Right)));
             this.flowLayoutPanel1.AutoScroll = true;
             this.flowLayoutPanel1.Controls.Add(this.pictureBox4);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(18, 9);
-            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 6);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(1860, 108);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(1240, 38);
             this.flowLayoutPanel1.TabIndex = 11;
             this.flowLayoutPanel1.WrapContents = false;
             // 
             // pictureBox4
             // 
             this.pictureBox4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pictureBox4.Location = new System.Drawing.Point(4, 5);
-            this.pictureBox4.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pictureBox4.Location = new System.Drawing.Point(3, 3);
             this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(94, 96);
+            this.pictureBox4.Size = new System.Drawing.Size(32, 32);
             this.pictureBox4.TabIndex = 7;
             this.pictureBox4.TabStop = false;
             this.pictureBox4.Click += new System.EventHandler(this.Texture_Click);
             // 
-            // saveAsButton
-            // 
-            this.saveAsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveAsButton.Location = new System.Drawing.Point(1771, 13);
-            this.saveAsButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.saveAsButton.Name = "saveAsButton";
-            this.saveAsButton.Size = new System.Drawing.Size(112, 35);
-            this.saveAsButton.TabIndex = 4;
-            this.saveAsButton.Text = "Uložit jako...";
-            this.saveAsButton.UseVisualStyleBackColor = true;
-            this.saveAsButton.Click += new System.EventHandler(this.saveAsButton_Click);
-            // 
-            // fileName
-            // 
-            this.fileName.AutoSize = true;
-            this.fileName.Location = new System.Drawing.Point(18, 20);
-            this.fileName.Name = "fileName";
-            this.fileName.Size = new System.Drawing.Size(99, 20);
-            this.fileName.TabIndex = 5;
-            this.fileName.Text = "Nový Soubor";
-            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1896, 1048);
+            this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.fillDock);
             this.Controls.Add(this.topDock);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "Raycaster Level Editor";
             this.panel1.ResumeLayout(false);
@@ -380,7 +365,7 @@ namespace LevelEditor
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.Button loadButton;
-        private System.Windows.Forms.Label fileName;
+        private System.Windows.Forms.Label fileNameLabel;
         private System.Windows.Forms.Button saveAsButton;
     }
 }

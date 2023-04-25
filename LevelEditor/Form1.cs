@@ -15,7 +15,7 @@ namespace LevelEditor
     {
         /* Pravidla pro vykreslovani tabulky a textur
          * zadavat podle tlacitek a prvniho pole v navrhu */
-        const int IMAGE_SIZE = 64;
+        const int IMAGE_SIZE = 32;
         const int IMAGE_GAP = 6;
         const int MAP_FIRST_IMAGE_X = 38;
         const int MAP_FIRST_IMAGE_Y = 38;
@@ -85,6 +85,39 @@ namespace LevelEditor
             }
         }
 
+        string fileName = "";
+        string FileName
+        {
+            get { return fileName; }
+            set
+            {
+                fileName = value;
+                drawFileName();
+            }
+        }
+
+        bool isSaved = true;
+        bool IsSaved
+        {
+            get { return isSaved; }
+            set
+            {
+                isSaved = value;
+                drawFileName();
+            }
+        }
+
+        private void drawFileName()
+        {
+            string text = fileName;
+
+            if (text == "") text = "Nový Soubor";
+
+            if (!isSaved) text += "*";
+
+            fileNameLabel.Text = text;
+        }
+
         private void addX(int num)
         {
             for (int n = 0; n < num; n++)
@@ -100,6 +133,7 @@ namespace LevelEditor
                         pictureBox.BorderStyle = BorderStyle.FixedSingle;
                         pictureBox.Tag = new CellPosition(i, mapsCells[i][j].Count, j);
                         pictureBox.MouseMove += new MouseEventHandler(Cell_MouseMove);
+                        pictureBox.Click += new EventHandler(Cell_Click);
 
                         mapsCells[i][j].Add(pictureBox);
 
@@ -133,6 +167,7 @@ namespace LevelEditor
                         pictureBox.BorderStyle = BorderStyle.FixedSingle;
                         pictureBox.Tag = new CellPosition(i, j, mapsCells[i].Count - 1);
                         pictureBox.MouseMove += new MouseEventHandler(Cell_MouseMove);
+                        pictureBox.Click += new EventHandler(Cell_Click);
 
                         mapsCells[i][mapsCells[i].Count - 1].Add(pictureBox);
 
@@ -198,21 +233,29 @@ namespace LevelEditor
         private void buttonAddX_Click(object sender, EventArgs e)
         {
             addX(1);
+
+            IsSaved = false;
         }
 
         private void buttonAddY_Click(object sender, EventArgs e)
         {
             addY(1);
+
+            IsSaved = false;
         }
 
         private void buttonRemoveX_Click(object sender, EventArgs e)
         {
             removeX(1);
+
+            IsSaved = false;
         }
 
         private void buttonRemoveY_Click(object sender, EventArgs e)
         {
             removeY(1);
+
+            IsSaved = false;
         }
 
         private void Texture_Click(object sender, EventArgs e)
@@ -226,34 +269,40 @@ namespace LevelEditor
             selectedTexture = textureBoxes.IndexOf(pictureBox);
         }
 
+        private void Cell_Click(object sender, EventArgs e)
+        {
+            Control control = (Control)sender;
+            control.Capture = false;
+
+            PictureBox pictureBox = (PictureBox)sender;
+
+            // Renderovani
+            if (selectedTexture > 0)
+            {
+                Bitmap bitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
+
+                // Zvetsit obrazek
+                Graphics graphics = Graphics.FromImage(bitmap);
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                graphics.DrawImage(bitmaps[selectedTexture - 1], 0, 0, IMAGE_SIZE, IMAGE_SIZE);
+
+                pictureBox.Image = bitmap;
+            }
+            else pictureBox.Image = new Bitmap(1, 1);
+
+            // Upraveni pole hodnot na pozadi
+            CellPosition cellPosition = (CellPosition)pictureBox.Tag;
+
+            mapsValues[cellPosition.mapIndex][cellPosition.y][cellPosition.x] = selectedTexture;
+
+            IsSaved = false;
+        }
+
         private void Cell_MouseMove(object sender, MouseEventArgs e)
         {
-            if (MouseButtons == MouseButtons.Left)
-            {
-                Control control = (Control) sender;
-                control.Capture = false;
-                
-                PictureBox pictureBox = (PictureBox)sender;
+            if (MouseButtons != MouseButtons.Left) return;
 
-                // Renderovani
-                if (selectedTexture > 0)
-                {
-                    Bitmap bitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
-
-                    // Zvetsit obrazek
-                    Graphics graphics = Graphics.FromImage(bitmap);
-                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                    graphics.DrawImage(bitmaps[selectedTexture - 1], 0, 0, IMAGE_SIZE, IMAGE_SIZE);
-
-                    pictureBox.Image = bitmap;
-                }
-                else pictureBox.Image = new Bitmap(1, 1);
-
-                // Upraveni pole hodnot na pozadi
-                CellPosition cellPosition = (CellPosition)pictureBox.Tag;
-
-                mapsValues[cellPosition.mapIndex][cellPosition.y][cellPosition.x] = selectedTexture;
-            }
+            Cell_Click(sender, e);
         }
 
         private void setSize(int width, int height)
@@ -314,52 +363,54 @@ namespace LevelEditor
             if (!exists) openFileDialog.CheckFileExists = false;
             openFileDialog.ShowDialog();
 
-            fileName.Text = openFileDialog.FileName;
+            FileName = openFileDialog.FileName;
         }
 
         private void loadButton_Click(object sender, EventArgs e)
         {
-            while (!File.Exists(fileName.Text)) getFile();
+            while (!File.Exists(FileName)) getFile();
             
             fillDock.Visible = false;
             
-            int width = Parser.parseInt(fileName.Text, "width");
-            int height = Parser.parseInt(fileName.Text, "height");
+            int width = Parser.parseInt(FileName, "width");
+            int height = Parser.parseInt(FileName, "height");
 
             setSize(width, height);
 
-            loadMap(Parser.parseIntArray(fileName.Text, "mapWalls", width * height), 0, width, height);
-            loadMap(Parser.parseIntArray(fileName.Text, "mapFloors", width * height), 1, width, height);
-            loadMap(Parser.parseIntArray(fileName.Text, "mapCeilings", width * height), 2, width, height);
-
-            
+            loadMap(Parser.parseIntArray(FileName, "mapWalls", width * height), 0, width, height);
+            loadMap(Parser.parseIntArray(FileName, "mapFloors", width * height), 1, width, height);
+            loadMap(Parser.parseIntArray(FileName, "mapCeilings", width * height), 2, width, height);
 
             fillDock.Visible = true;
+
+            IsSaved = true;
         }
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            while (fileName.Text == "") getFile(false);
+            while (FileName == "") getFile(false);
             
-            File.WriteAllText(fileName.Text, "");
+            File.WriteAllText(FileName, "");
 
-            Parser.writeValue(fileName.Text, "width", mapsValues[0].Count.ToString());
-            Parser.writeValue(fileName.Text, "height", mapsValues[0][0].Count.ToString());
+            Parser.writeValue(FileName, "width", mapsValues[0].Count.ToString());
+            Parser.writeValue(FileName, "height", mapsValues[0][0].Count.ToString());
 
-            File.AppendAllText(fileName.Text, "\n");
+            File.AppendAllText(FileName, "\n");
 
             /* TODO: dalsi hodnoty levelu */ 
 
-            Parser.write2DArray(fileName.Text, "mapWalls", mapsValues[0].Select(list => list.ToArray()).ToArray());
-            File.AppendAllText(fileName.Text, "\n");
-            Parser.write2DArray(fileName.Text, "mapFloors", mapsValues[1].Select(list => list.ToArray()).ToArray());
-            File.AppendAllText(fileName.Text, "\n");
-            Parser.write2DArray(fileName.Text, "mapCeilings", mapsValues[2].Select(list => list.ToArray()).ToArray());
+            Parser.write2DArray(FileName, "mapWalls", mapsValues[0].Select(list => list.ToArray()).ToArray());
+            File.AppendAllText(FileName, "\n");
+            Parser.write2DArray(FileName, "mapFloors", mapsValues[1].Select(list => list.ToArray()).ToArray());
+            File.AppendAllText(FileName, "\n");
+            Parser.write2DArray(FileName, "mapCeilings", mapsValues[2].Select(list => list.ToArray()).ToArray());
+
+            IsSaved = true;
         }
 
         private void saveAsButton_Click(object sender, EventArgs e)
         {
-            fileName.Text = "";
+            FileName = "";
 
             saveButton_Click(sender, e);
         }
