@@ -35,6 +35,7 @@ namespace LevelEditor
             this.label1 = new System.Windows.Forms.Label();
             this.buttonRemoveX = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.spawnPoint = new System.Windows.Forms.Panel();
             this.buttonRemoveY = new System.Windows.Forms.Button();
             this.buttonAddX = new System.Windows.Forms.Button();
             this.buttonAddY = new System.Windows.Forms.Button();
@@ -51,8 +52,12 @@ namespace LevelEditor
             this.saveButton = new System.Windows.Forms.Button();
             this.loadButton = new System.Windows.Forms.Button();
             this.fillDock = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.spawnPointButton = new System.Windows.Forms.Panel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.nextLevel = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.flowLayoutPanel2.SuspendLayout();
@@ -73,12 +78,13 @@ namespace LevelEditor
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.buttonRemoveX);
             this.panel1.Controls.Add(this.pictureBox1);
+            this.panel1.Controls.Add(this.spawnPoint);
             this.panel1.Controls.Add(this.buttonRemoveY);
             this.panel1.Controls.Add(this.buttonAddX);
             this.panel1.Controls.Add(this.buttonAddY);
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(73, 73);
+            this.panel1.Size = new System.Drawing.Size(75, 75);
             this.panel1.TabIndex = 8;
             // 
             // label1
@@ -94,7 +100,7 @@ namespace LevelEditor
             // 
             this.buttonRemoveX.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.buttonRemoveX.ForeColor = System.Drawing.Color.Red;
-            this.buttonRemoveX.Location = new System.Drawing.Point(6, 0);
+            this.buttonRemoveX.Location = new System.Drawing.Point(0, 0);
             this.buttonRemoveX.Name = "buttonRemoveX";
             this.buttonRemoveX.Size = new System.Drawing.Size(32, 32);
             this.buttonRemoveX.TabIndex = 5;
@@ -111,14 +117,22 @@ namespace LevelEditor
             this.pictureBox1.Size = new System.Drawing.Size(32, 32);
             this.pictureBox1.TabIndex = 2;
             this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.Cell_Click);
+            this.pictureBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseClick);
             this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
+            // 
+            // spawnPoint
+            // 
+            this.spawnPoint.BackColor = System.Drawing.Color.Gold;
+            this.spawnPoint.Location = new System.Drawing.Point(36, 36);
+            this.spawnPoint.Name = "spawnPoint";
+            this.spawnPoint.Size = new System.Drawing.Size(36, 36);
+            this.spawnPoint.TabIndex = 11;
             // 
             // buttonRemoveY
             // 
             this.buttonRemoveY.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.buttonRemoveY.ForeColor = System.Drawing.Color.Red;
-            this.buttonRemoveY.Location = new System.Drawing.Point(0, 6);
+            this.buttonRemoveY.Location = new System.Drawing.Point(0, 0);
             this.buttonRemoveY.Name = "buttonRemoveY";
             this.buttonRemoveY.Size = new System.Drawing.Size(32, 32);
             this.buttonRemoveY.TabIndex = 6;
@@ -160,9 +174,9 @@ namespace LevelEditor
             this.flowLayoutPanel2.Controls.Add(this.panel1);
             this.flowLayoutPanel2.Controls.Add(this.panel2);
             this.flowLayoutPanel2.Controls.Add(this.panel3);
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(12, 50);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(12, 94);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(1240, 581);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(1240, 537);
             this.flowLayoutPanel2.TabIndex = 9;
             // 
             // panel2
@@ -171,7 +185,7 @@ namespace LevelEditor
             this.panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.pictureBox2);
-            this.panel2.Location = new System.Drawing.Point(82, 3);
+            this.panel2.Location = new System.Drawing.Point(84, 3);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(73, 73);
             this.panel2.TabIndex = 9;
@@ -193,7 +207,7 @@ namespace LevelEditor
             this.pictureBox2.Size = new System.Drawing.Size(32, 32);
             this.pictureBox2.TabIndex = 2;
             this.pictureBox2.TabStop = false;
-            this.pictureBox2.Click += new System.EventHandler(this.Cell_Click);
+            this.pictureBox2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseClick);
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
             // 
             // panel3
@@ -202,7 +216,7 @@ namespace LevelEditor
             this.panel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel3.Controls.Add(this.label3);
             this.panel3.Controls.Add(this.pictureBox3);
-            this.panel3.Location = new System.Drawing.Point(161, 3);
+            this.panel3.Location = new System.Drawing.Point(163, 3);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(73, 73);
             this.panel3.TabIndex = 10;
@@ -224,7 +238,7 @@ namespace LevelEditor
             this.pictureBox3.Size = new System.Drawing.Size(32, 32);
             this.pictureBox3.TabIndex = 2;
             this.pictureBox3.TabStop = false;
-            this.pictureBox3.Click += new System.EventHandler(this.Cell_Click);
+            this.pictureBox3.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseClick);
             this.pictureBox3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Cell_MouseMove);
             // 
             // topDock
@@ -284,6 +298,10 @@ namespace LevelEditor
             // 
             // fillDock
             // 
+            this.fillDock.Controls.Add(this.label5);
+            this.fillDock.Controls.Add(this.nextLevel);
+            this.fillDock.Controls.Add(this.label4);
+            this.fillDock.Controls.Add(this.spawnPointButton);
             this.fillDock.Controls.Add(this.flowLayoutPanel1);
             this.fillDock.Controls.Add(this.flowLayoutPanel2);
             this.fillDock.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -292,13 +310,32 @@ namespace LevelEditor
             this.fillDock.Size = new System.Drawing.Size(1264, 643);
             this.fillDock.TabIndex = 11;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(53, 19);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(112, 13);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "- Nastavit  spawnpoint";
+            // 
+            // spawnPointButton
+            // 
+            this.spawnPointButton.BackColor = System.Drawing.Color.Gold;
+            this.spawnPointButton.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.spawnPointButton.Location = new System.Drawing.Point(15, 9);
+            this.spawnPointButton.Name = "spawnPointButton";
+            this.spawnPointButton.Size = new System.Drawing.Size(32, 32);
+            this.spawnPointButton.TabIndex = 12;
+            this.spawnPointButton.Click += new System.EventHandler(this.spawnPointButton_Click);
+            // 
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.flowLayoutPanel1.AutoScroll = true;
             this.flowLayoutPanel1.Controls.Add(this.pictureBox4);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 6);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 50);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(1240, 38);
             this.flowLayoutPanel1.TabIndex = 11;
@@ -313,6 +350,25 @@ namespace LevelEditor
             this.pictureBox4.TabIndex = 7;
             this.pictureBox4.TabStop = false;
             this.pictureBox4.Click += new System.EventHandler(this.Texture_Click);
+            // 
+            // nextLevel
+            // 
+            this.nextLevel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.nextLevel.Location = new System.Drawing.Point(241, 15);
+            this.nextLevel.Name = "nextLevel";
+            this.nextLevel.Size = new System.Drawing.Size(1011, 20);
+            this.nextLevel.TabIndex = 14;
+            this.nextLevel.TextChanged += new System.EventHandler(this.nextLevel_TextChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(171, 19);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(64, 13);
+            this.label5.TabIndex = 15;
+            this.label5.Text = "Další mapa:";
             // 
             // Form1
             // 
@@ -338,6 +394,7 @@ namespace LevelEditor
             this.topDock.ResumeLayout(false);
             this.topDock.PerformLayout();
             this.fillDock.ResumeLayout(false);
+            this.fillDock.PerformLayout();
             this.flowLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             this.ResumeLayout(false);
@@ -367,6 +424,11 @@ namespace LevelEditor
         private System.Windows.Forms.Button loadButton;
         private System.Windows.Forms.Label fileNameLabel;
         private System.Windows.Forms.Button saveAsButton;
+        private Panel spawnPoint;
+        private Label label4;
+        private Panel spawnPointButton;
+        private Label label5;
+        private TextBox nextLevel;
     }
 }
 

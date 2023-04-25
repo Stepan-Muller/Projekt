@@ -19,6 +19,7 @@ namespace LevelEditor
         const int IMAGE_GAP = 6;
         const int MAP_FIRST_IMAGE_X = 38;
         const int MAP_FIRST_IMAGE_Y = 38;
+        const int SPAWN_POINT_BORDER_SIZE = 2;
 
         Panel[] panels = new Panel[3];
 
@@ -30,6 +31,9 @@ namespace LevelEditor
 
         List<PictureBox> textureBoxes;
         int selectedTexture = 0;
+
+        int spawnPointX = 0, spawnPointY = 0;
+        bool settingSpawnPoint = false;
 
         public Form1()
         {
@@ -133,7 +137,8 @@ namespace LevelEditor
                         pictureBox.BorderStyle = BorderStyle.FixedSingle;
                         pictureBox.Tag = new CellPosition(i, mapsCells[i][j].Count, j);
                         pictureBox.MouseMove += new MouseEventHandler(Cell_MouseMove);
-                        pictureBox.Click += new EventHandler(Cell_Click);
+                        pictureBox.MouseClick += new MouseEventHandler(Cell_MouseClick);
+                        pictureBox.BringToFront();
 
                         mapsCells[i][j].Add(pictureBox);
 
@@ -167,7 +172,8 @@ namespace LevelEditor
                         pictureBox.BorderStyle = BorderStyle.FixedSingle;
                         pictureBox.Tag = new CellPosition(i, j, mapsCells[i].Count - 1);
                         pictureBox.MouseMove += new MouseEventHandler(Cell_MouseMove);
-                        pictureBox.Click += new EventHandler(Cell_Click);
+                        pictureBox.MouseClick += new MouseEventHandler(Cell_MouseClick);
+                        pictureBox.BringToFront();
 
                         mapsCells[i][mapsCells[i].Count - 1].Add(pictureBox);
 
@@ -258,51 +264,74 @@ namespace LevelEditor
             IsSaved = false;
         }
 
+        private void spawnPointButton_Click(object sender, EventArgs e)
+        {
+            spawnPointButton.BorderStyle = BorderStyle.Fixed3D;
+
+            textureBoxes[selectedTexture].BorderStyle = BorderStyle.FixedSingle;
+
+            settingSpawnPoint = true;
+        }
+
         private void Texture_Click(object sender, EventArgs e)
         {
             textureBoxes[selectedTexture].BorderStyle = BorderStyle.FixedSingle;
 
             PictureBox pictureBox = (PictureBox)sender;
 
+            spawnPointButton.BorderStyle = BorderStyle.FixedSingle;
             pictureBox.BorderStyle = BorderStyle.Fixed3D;
 
             selectedTexture = textureBoxes.IndexOf(pictureBox);
         }
 
-        private void Cell_Click(object sender, EventArgs e)
+        private void changeSpawnPoint(int x, int y)
         {
-            Control control = (Control)sender;
-            control.Capture = false;
+            spawnPointX = x;
+            spawnPointY = y;
+            spawnPoint.Location = new Point(MAP_FIRST_IMAGE_X + x * (IMAGE_SIZE + IMAGE_GAP) - SPAWN_POINT_BORDER_SIZE, MAP_FIRST_IMAGE_Y + y * (IMAGE_SIZE + IMAGE_GAP) - SPAWN_POINT_BORDER_SIZE);
+        }
 
+        private void Cell_MouseClick(object sender, MouseEventArgs e)
+        {
             PictureBox pictureBox = (PictureBox)sender;
 
-            // Renderovani
-            if (selectedTexture > 0)
-            {
-                Bitmap bitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
-
-                // Zvetsit obrazek
-                Graphics graphics = Graphics.FromImage(bitmap);
-                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                graphics.DrawImage(bitmaps[selectedTexture - 1], 0, 0, IMAGE_SIZE, IMAGE_SIZE);
-
-                pictureBox.Image = bitmap;
-            }
-            else pictureBox.Image = new Bitmap(1, 1);
-
-            // Upraveni pole hodnot na pozadi
             CellPosition cellPosition = (CellPosition)pictureBox.Tag;
 
-            mapsValues[cellPosition.mapIndex][cellPosition.y][cellPosition.x] = selectedTexture;
+            if (!settingSpawnPoint)
+            {
+                Control control = (Control)sender;
+                control.Capture = false;
+
+                int texture = 0;
+                if (e.Button == MouseButtons.Left) texture = selectedTexture;
+
+                // Renderovani
+                if (texture > 0)
+                {
+                    Bitmap bitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
+
+                    // Zvetsit obrazek
+                    Graphics graphics = Graphics.FromImage(bitmap);
+                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    graphics.DrawImage(bitmaps[texture - 1], 0, 0, IMAGE_SIZE, IMAGE_SIZE);
+
+                    pictureBox.Image = bitmap;
+                }
+                else pictureBox.Image = new Bitmap(1, 1);
+
+                // Upraveni pole hodnot na pozadi
+                mapsValues[cellPosition.mapIndex][cellPosition.y][cellPosition.x] = texture;
+            }
+            else 
+                changeSpawnPoint(cellPosition.x, cellPosition.y);
 
             IsSaved = false;
         }
 
         private void Cell_MouseMove(object sender, MouseEventArgs e)
         {
-            if (MouseButtons != MouseButtons.Left) return;
-
-            Cell_Click(sender, e);
+            if (MouseButtons == MouseButtons.Left || MouseButtons == MouseButtons.Right) Cell_MouseClick(sender, e);
         }
 
         private void setSize(int width, int height)
@@ -368,7 +397,7 @@ namespace LevelEditor
 
         private void loadButton_Click(object sender, EventArgs e)
         {
-            while (!File.Exists(FileName)) getFile();
+            do getFile(); while (!File.Exists(FileName));
             
             fillDock.Visible = false;
             
@@ -376,6 +405,10 @@ namespace LevelEditor
             int height = Parser.parseInt(FileName, "height");
 
             setSize(width, height);
+
+            changeSpawnPoint(Parser.parseInt(fileName, "spawnX"), Parser.parseInt(fileName, "spawnY"));
+
+            nextLevel.Text = Parser.parseString(FileName, "nextLevel");
 
             loadMap(Parser.parseIntArray(FileName, "mapWalls", width * height), 0, width, height);
             loadMap(Parser.parseIntArray(FileName, "mapFloors", width * height), 1, width, height);
@@ -397,7 +430,14 @@ namespace LevelEditor
 
             File.AppendAllText(FileName, "\n");
 
-            /* TODO: dalsi hodnoty levelu */ 
+            Parser.writeValue(FileName, "spawnX", spawnPointX.ToString());
+            Parser.writeValue(FileName, "spawnY", spawnPointY.ToString());
+
+            File.AppendAllText(FileName, "\n");
+
+            Parser.writeValue(FileName, "nextLevel", nextLevel.Text);
+
+            File.AppendAllText(FileName, "\n");
 
             Parser.write2DArray(FileName, "mapWalls", mapsValues[0].Select(list => list.ToArray()).ToArray());
             File.AppendAllText(FileName, "\n");
@@ -406,6 +446,11 @@ namespace LevelEditor
             Parser.write2DArray(FileName, "mapCeilings", mapsValues[2].Select(list => list.ToArray()).ToArray());
 
             IsSaved = true;
+        }
+
+        private void nextLevel_TextChanged(object sender, EventArgs e)
+        {
+            IsSaved = false;
         }
 
         private void saveAsButton_Click(object sender, EventArgs e)
