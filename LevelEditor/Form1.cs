@@ -542,13 +542,13 @@ namespace LevelEditor
                         graphics.DrawImage(bitmaps[map[y * width + x] - 1], 0, 0, IMAGE_SIZE, IMAGE_SIZE);
 
                         // Ulozit bitmapu
-                        mapsCells[mapIndex][x][y].Image = bitmap;
+                        mapsCells[mapIndex][y][x].Image = bitmap;
                     }
                     // Pokud je prazda => nacist prazdnou texturu
-                    else mapsCells[mapIndex][x][y].Image = new Bitmap(1, 1);
+                    else mapsCells[mapIndex][y][x].Image = new Bitmap(1, 1);
 
                     // Ulozit hodnotu bunky
-                    mapsValues[mapIndex][x][y] = map[y * width + x];
+                    mapsValues[mapIndex][y][x] = map[y * width + x];
                 }
             }
         }
@@ -610,6 +610,9 @@ namespace LevelEditor
             // Pokud neni vybran zadny soubor => otevrit okno pro vyber souboru
             while (FileName == "") getFile(false);
 
+            // Vymazat obsah souboru
+            File.WriteAllText(FileName, "");
+            
             // Zapsat velikost mapy do souboru
             Parser.writeValue(FileName, "width", mapsValues[0].Count.ToString());
             Parser.writeValue(FileName, "height", mapsValues[0][0].Count.ToString());

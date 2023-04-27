@@ -1,8 +1,8 @@
 # width 8
 # height 8
 
-# spawnX 0
-# spawnY 0
+# spawnX 2
+# spawnY 2
 
 # nextLevel ../levels/map_2.txt
 

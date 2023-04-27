@@ -11,7 +11,6 @@
 #include "parser.c"
 
 /* Konstanty */
-#define RENDER_DISTANCE 8
 #define PLAYER_SIZE 0.3 // velikost hrace v pixelech
 #define MOVE_SPEED 3
 #define TEXTURE_RESOLUTION 16 // sirka a vyska textur v pixelech
@@ -31,11 +30,8 @@ float playerX, playerY, playerDeltaX, playerDeltaY, playerAngle, deltaTime;
 
 static void respawn()
 {
-    playerX = playerSpawnX - 0.5;
-    playerY = playerSpawnY - 0.5;
-    playerAngle = 0;
-    playerDeltaX = cos(playerAngle);
-    playerDeltaY = sin(playerAngle);
+    playerX = playerSpawnX + 0.5;
+    playerY = playerSpawnY + 0.5;
 }
 
 static void loadTextureMap()
@@ -333,7 +329,7 @@ void draw3D()
             }
 
             // hledat kolizi
-            for (int i = 0; i < RENDER_DISTANCE; i++)
+            for (int i = 0; true; i++)
             {
                 int mapPointer = (int)(rayY) * mapWidth + (int)(rayX);
 
@@ -399,7 +395,7 @@ void draw3D()
             }
 
             // hledat kolizi
-            for (int i = 0; i < RENDER_DISTANCE; i++)
+            for (int i = 0; true; i++)
             {
                 int mapPointer = (int)(rayY)*mapWidth + (int)(rayX);
 
