@@ -96,7 +96,7 @@ namespace LevelEditor
         /// <param name="index">Poradove cislo bitmapy</param>
         /// <param name="width">Sirka bitmapy</param>
         /// <param name="height">Vyska bitmapy</param>
-        public static Bitmap parseBitmap(string path, string valueName, int index, int width, int height, )
+        public static Bitmap parseBitmap(string path, string valueName, int index, int width, int height)
         {
             // Nacist soubor do retezce
             string text = File.ReadAllText(path);

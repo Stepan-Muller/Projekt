@@ -86,7 +86,7 @@ namespace LevelEditor
             for (int i = 0; i < count; i++)
             {
                 // Precte bitmapu ze souboru
-                Bitmap bitmap = Parser.parseBitmap(width, height, "../textures/textureMap.txt", "textureMap", i);
+                Bitmap bitmap = Parser.parseBitmap("../textures/textureMap.txt", "textureMap", i, width, height);
 
                 // Zvetsi bitmapu na velikost obrazku
                 Bitmap resizedBitmap = new Bitmap(IMAGE_SIZE, IMAGE_SIZE);
@@ -655,10 +655,28 @@ namespace LevelEditor
 
         /// <summary>
         /// Zobrazi hvezdicku u jmena aktualniho souboru
-        /// <summary>
+        /// </summary>
         private void nextLevel_TextChanged(object sender, EventArgs e)
         {
             IsSaved = false;
+        }
+
+        /// <summary>
+        /// Zepta se zda chce uzivatel ulozit neulozenou praci
+        /// </summary>
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Pokud je prace ulozena => nechat zavrit okno
+            if (isSaved) return;
+
+            // Pokud pracew neni ulozena => zeptat se na ulozeni
+            DialogResult result = MessageBox.Show("Chcete uložit provedené změny?", "Potvrzeni uzavření", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            
+            // Pokud se ma prace ulozit
+            if (result == DialogResult.Yes) saveButton_Click(sender, e);
+            // Pokud se ma zavreni okna zrusit
+            else if (result == DialogResult.Cancel) e.Cancel = true;
+            // Pokud se prace nema ulozit => neudelat nic a zavrit
         }
     }
 }
