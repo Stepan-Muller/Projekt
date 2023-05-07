@@ -3,64 +3,73 @@
 
 #define MAX_LENGTH 20 // maximalni delka slova
 
-static void skipUntil(FILE* file, char* valueName)
+static int skipUntil(FILE* file, char* valueName)
 {
-    char s[MAX_LENGTH + 1] = {0};
+    char s[MAX_LENGTH + 1] = { 0 };
     
-    while (1)
+    while (!feof(file))
     {
         fscanf_s(file, "%s", s, MAX_LENGTH);
+
         if (strcmp(s, "#") == 0)
         {
             fscanf_s(file, "%s", s, MAX_LENGTH);
             if (strcmp(s, valueName) == 0)
-                return;
+                return 1;
         }
     }
+
+    return 0;
 }
 
-static void parseInt(char* path, char* valueName, int* output)
+static int parseInt(char* path, char* valueName, int* output)
 {
     FILE* file;
     errno_t error = fopen_s(&file, path, "r");
 
     if (error)
-        return;
+        return 0;
 
-    skipUntil(file, valueName);
+    if (skipUntil(file, valueName) == 0) return 0;
 
     fscanf_s(file, "%i", output);
 
     fclose(file);
+
+    return 1;
 }
 
-static void parseString(char* path, char* valueName, char* output, int maxLength)
+static int parseString(char* path, char* valueName, char* output, int maxLength)
 {
     FILE* file;
     errno_t error = fopen_s(&file, path, "r");
 
     if (error)
-        return;
+        return 0;
 
-    skipUntil(file, valueName);
+    if (skipUntil(file, valueName) == 0) return 0;
 
     fscanf_s(file, "%s", output, maxLength);
 
     fclose(file);
+
+    return 1;
 }
 
-static void parseIntArray(char* path, char* valueName, int* output, int size)
+static int parseIntArray(char* path, char* valueName, int* output, int size)
 {
     FILE* file;
     errno_t error = fopen_s(&file, path, "r");
 
     if (error)
-        return;
+        return 0;
     
-    skipUntil(file, valueName);
+    if (skipUntil(file, valueName) == 0) return 0;
 
     for (int i = 0; i < size; i++)
         fscanf_s(file, "%i", &output[i]);
 
     fclose(file);
+
+    return 1;
 }

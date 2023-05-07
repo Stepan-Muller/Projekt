@@ -93,14 +93,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     
     if (key == GLFW_KEY_E && action == GLFW_PRESS)
     {
-        switch (mapWalls[(int)(playerY + playerDeltaY * 0.5) * mapWidth + (int)(playerX + playerDeltaX * 0.5)])
-        {
-        case 2:
-            loadMap(nextLevel);
-            break;
-        }
-    }
+        int blockPosition = (int)(playerY + playerDeltaY * 0.5) * mapWidth + (int)(playerX + playerDeltaX * 0.5);
+        int texture = mapWalls[blockPosition];
 
+        char valueName[20];
+
+        int affectedTetxure = 0;
+
+        // Mackani tlacitek
+        sprintf_s(valueName, 20, "button%d", texture);
+
+        if (parseInt("../textures/textureMap.txt", valueName, &affectedTetxure))
+            mapWalls[blockPosition] = affectedTetxure;
+
+        // Otevirani dveri
+        sprintf_s(valueName, 20, "door%d", texture);
+
+        if (parseInt("../textures/textureMap.txt", valueName, &affectedTetxure))
+            for (int i = 0; i < mapWidth * mapHeight; i++)
+                if (mapWalls[i] == affectedTetxure)
+                    mapWalls[i] = 0;
+    }
 }
 
 float lastXpos, lastYpos;
