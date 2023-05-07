@@ -24,7 +24,7 @@ float turnSensitivity = 0.002;
 
 /* Globalni promenne */
 bool debug = false, menu = false, resetMouse = false;
-int mapWidth, mapHeight, playerSpawnX, playerSpawnY, * mapWalls, * mapFloors, * mapCeilings, screenWidth, screenHeight, * textureMap;
+int mapWidth, mapHeight, playerSpawnX, playerSpawnY, * mapWalls, * mapFloors, * mapCeilings, screenWidth, screenHeight, * textureMap, requirementsLenght, * requirements, forbiddenLenght, * forbidden;
 char* nextLevel[20];
 float playerX, playerY, playerDeltaX, playerDeltaY, playerAngle, deltaTime;
 
@@ -70,9 +70,79 @@ static void loadMap(char* name)
     playerSpawnY = 0;
     parseInt(name, "spawnY", &playerSpawnY);
 
+    /* Precist dalsi level a pozadavky pro nej */
+    parseInt(name, "requirementsLenght", &requirementsLenght);
+    requirements = (int*)realloc(requirements, requirementsLenght * sizeof(int));
+    parseIntArray(name, "requirements", requirements, requirementsLenght);
+
+    parseInt(name, "forbiddenLenght", &forbiddenLenght);
+    forbidden = (int*)realloc(forbidden, forbiddenLenght * sizeof(int));
+    parseIntArray(name, "forbidden", forbidden, forbiddenLenght);
+    
     parseString(name, "nextLevel", nextLevel, 20);
 
     respawn();
+}
+
+static void openLevelDoors(bool open)
+{
+    int closedTexture = 0, openedTexture = 0;
+
+    parseInt("../textures/textureMap.txt", "nextLevelClosed", &closedTexture);
+    parseInt("../textures/textureMap.txt", "nextLevelOpen", &openedTexture);
+
+    if (open)
+    {
+        for (int i = 0; i < mapWidth * mapHeight; i++)
+            if (mapWalls[i] == closedTexture) mapWalls[i] = openedTexture;
+    }
+    else
+    {
+        for (int i = 0; i < mapWidth * mapHeight; i++)
+            if (mapWalls[i] == openedTexture) mapWalls[i] = closedTexture;
+    }
+}
+
+static void checkRequirements()
+{
+    /* Kontrola nesplnìní nìjakého zákazu */
+
+    for (int i = 0; i < forbiddenLenght; i++)
+    {
+        for (int j = 0; j < mapWidth * mapHeight; j++)
+        {
+            if (mapWalls[j] == forbidden[i])
+            {
+                openLevelDoors(false);
+                return;
+            }
+        }
+    }
+
+    /* Kontrola splnìní všech požadavkù */
+    
+    for (int i = 0; i < requirementsLenght; i++)
+    {
+        for (int j = 0; j < mapWidth * mapHeight; j++)
+        {
+            if (mapWalls[j] == requirements[i])
+            {
+                i++;
+                goto found;
+            }
+        }
+
+        // Nìjaký se nenašel
+
+        openLevelDoors(false);
+        return;
+
+    found: continue;
+    }
+
+    // Našli se všechny
+
+    openLevelDoors(true);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -93,26 +163,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     
     if (key == GLFW_KEY_E && action == GLFW_PRESS)
     {
-        int blockPosition = (int)(playerY + playerDeltaY * 0.5) * mapWidth + (int)(playerX + playerDeltaX * 0.5);
+        int blockPosition = (int)(playerY + playerDeltaY * 0.9) * mapWidth + (int)(playerX + playerDeltaX * 0.9);
         int texture = mapWalls[blockPosition];
 
         char valueName[20];
 
         int affectedTetxure = 0;
 
-        // Mackani tlacitek
-        sprintf_s(valueName, 20, "button%d", texture);
+        // Novy level
+        parseInt("../textures/textureMap.txt", "nextLevelOpen", &affectedTetxure);
+        
+        if (texture == affectedTetxure)
+            loadMap(nextLevel);
+
+        // Klikaci textury
+        sprintf_s(valueName, 20, "%d", texture);
 
         if (parseInt("../textures/textureMap.txt", valueName, &affectedTetxure))
             mapWalls[blockPosition] = affectedTetxure;
 
-        // Otevirani dveri
-        sprintf_s(valueName, 20, "door%d", texture);
-
-        if (parseInt("../textures/textureMap.txt", valueName, &affectedTetxure))
-            for (int i = 0; i < mapWidth * mapHeight; i++)
-                if (mapWalls[i] == affectedTetxure)
-                    mapWalls[i] = 0;
+        checkRequirements();
     }
 }
 
@@ -620,7 +690,7 @@ int WinMain(void)
 
     loadTextureMap();
 
-    loadMap("../levels/map_2.txt");
+    loadMap("../levels/map_1.txt");
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))

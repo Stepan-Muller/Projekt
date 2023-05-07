@@ -407,6 +407,8 @@ namespace LevelEditor
             // Zvyrazni tlacitko
             pictureBox.BorderStyle = BorderStyle.Fixed3D;
 
+            settingSpawnPoint = false;
+
             // Najde poradove cislo zakliknute textury
             selectedTexture = textureBoxes.IndexOf(pictureBox);
         }
