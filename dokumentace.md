@@ -6,6 +6,7 @@ Výstupem projektu je demo hry v raycastingovém 2.5D enginu, společně s Level
   * [Raycaster](#raycaster)
     + [Návod k použití](#návod-k-použití)
       - [Před spuštěním](#před-spuštěním)
+      - [Ovládání](#ovládání)
     + [Jak ray casting funguje?](#jak-ray-casting-funguje)
     + [Použité technologie](#použité-technologie)
   * [Level Editor](#level-editor)
@@ -17,6 +18,7 @@ Výstupem projektu je demo hry v raycastingovém 2.5D enginu, společně s Level
     + [Formát ukládaných souborů](#formát-ukládaných-souborů)
     + [Použité technologie](#použité-technologie-1)
   * [Formát souborů](#formát-souborů)
+  * [Reálné využití](#reálné-využití)
 
 ## Raycaster
 
@@ -43,6 +45,15 @@ Potřebný je minimálně level **map_1.txt**, poté případně další podle h
 	- **mapWalls**, **mapFloors**, **mapCeilings** - mapy textur
 
 Soubory viz [Formát souboru](#formát-souborů)
+
+#### Ovládání
+
+- **WSAD** - pohyb hráče
+- **pohyb myši** - otočení hráče
+- **E** - interakce s blokem před hráčem (Dvěře, tlačítko, ...)
+- **ESC** - pauza - uvolnění myši
+- **F3** - debug obrazovka s 2D zobrazením map
+- **F4** - znovunačtení textur
 
 ### Jak ray casting funguje?
 
@@ -223,3 +234,11 @@ Pole je vždy pouze jednorozměrné, pro více rozměrné pole o předem neznám
 ```
 
 Mezi jednotlivými hodnotami se může nacházet jakýkoliv text, komentáře, určené pro zjednodušení orientace v souboru.
+
+## Reálné využití
+
+Raycasting se ve hrách používal spíše v historii, díky tomu, že byl výpočetné poměrně rychlý. Dnes jsou již mnohem jednodušší klasické hry s renderováním pomocí polygonů.
+
+Jedno využití pro raycasting v moderních hrách, je při renderování skutečných 3D prostorů vytvořených, místo z polygonů, z **voxelů** (volumetric pixel - 3D pixel), například ve hře Teardown. Svět z voxelů je blíže realitě - objekty nejsou duté, ale vyplněné, voxely jsou vpodstatě zvětšené atomy. Tímto směrem by mohl také dále pokračovat tento projekt.
+
+Podobé Raycastingu je také Raytracing, který navíc simuluje několikanásobný odraz světla od objektů.
