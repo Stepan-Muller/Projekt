@@ -28,14 +28,17 @@ int mapWidth, mapHeight, playerSpawnX, playerSpawnY, * mapWalls, * mapFloors, * 
 char* nextLevel[20];
 float playerX, playerY, playerDeltaX, playerDeltaY, playerAngle, deltaTime;
 
+/* Vrati hrace na pocatecni hodnotu */
 static void respawn()
 {
     playerX = playerSpawnX + 0.5;
     playerY = playerSpawnY + 0.5;
 }
 
+/* Nacte mapu textur */
 static void loadTextureMap()
 {
+    // Nacte velikost mapy textur
     int count = 0, width = 0, height = 0;
     parseInt("../textures/textureMap.txt", "count", &count);
     parseInt("../textures/textureMap.txt", "width", &width);
@@ -43,20 +46,21 @@ static void loadTextureMap()
 
     int textureMapSize = count * width * height * 3;
 
+    // Nacte samotnou mapu textur
     textureMap = (int*)malloc(textureMapSize * sizeof(int));
     parseIntArray("../textures/textureMap.txt", "textureMap", textureMap, textureMapSize);
 }
-
+ /* Nacte mapu a vsechny jeji hodnoty */
 static void loadMap(char* name)
 {
-    /* Precist velikost mapy */
+    // Precist velikost mapy
     mapWidth = 0;
     parseInt(name, "width", &mapWidth);
     mapHeight = 0;
     parseInt(name, "height", &mapHeight);
     int mapSize = mapWidth * mapHeight;
 
-    /* Precist mapu */
+    // Precist mapu
     mapWalls = (int*)realloc(mapWalls, mapSize * sizeof(int));
     parseIntArray(name, "mapWalls", mapWalls, mapSize);
     mapFloors = (int*)realloc(mapFloors, mapSize * sizeof(int));
@@ -64,13 +68,13 @@ static void loadMap(char* name)
     mapCeilings = (int*)realloc(mapCeilings, mapSize * sizeof(int));
     parseIntArray(name, "mapCeilings", mapCeilings, mapSize);
 
-    /* Precist spawnpoint hrace */
+    // Precist spawnpoint hrace
     playerSpawnX = 0;
     parseInt(name, "spawnX", &playerSpawnX);
     playerSpawnY = 0;
     parseInt(name, "spawnY", &playerSpawnY);
 
-    /* Precist dalsi level a pozadavky pro nej */
+    // Precist dalsi level a pozadavky pro nej
     parseInt(name, "requirementsLenght", &requirementsLenght);
     requirements = (int*)realloc(requirements, requirementsLenght * sizeof(int));
     parseIntArray(name, "requirements", requirements, requirementsLenght);
@@ -81,9 +85,11 @@ static void loadMap(char* name)
     
     parseString(name, "nextLevel", nextLevel, 20);
 
+    // Natsavi pozici hrace na pocatecni pozici
     respawn();
 }
 
+/* Odemkne nebo zamkne dvere do dalsiho levelu */
 static void openLevelDoors(bool open)
 {
     int closedTexture = 0, openedTexture = 0;
@@ -103,6 +109,7 @@ static void openLevelDoors(bool open)
     }
 }
 
+/* Zjisti, zda maji byt odemknuty, nebo zamknuty dvere do dalsiho levelu */
 static void checkRequirements()
 {
     /* Kontrola nesplnìní nìjakého zákazu */
@@ -145,12 +152,16 @@ static void checkRequirements()
     openLevelDoors(true);
 }
 
+/* Kdyz je zmacknuta klavesa */
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    // Debug obrazovka
     if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
         debug = !debug;
+    // Znovunacteni mapy textur
     if (key == GLFW_KEY_F4 && action == GLFW_PRESS)
         loadTextureMap();
+    // Uvolneni mysi
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
         menu = !menu;
@@ -161,8 +172,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         resetMouse = true;
     }
     
+    // Interakce s blokem
     if (key == GLFW_KEY_E && action == GLFW_PRESS)
     {
+        // Najde s kterym blokem se interagovalo
         int blockPosition = (int)(playerY + playerDeltaY * 0.9) * mapWidth + (int)(playerX + playerDeltaX * 0.9);
         int texture = mapWalls[blockPosition];
 
@@ -182,10 +195,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         if (parseInt("../textures/textureMap.txt", valueName, &affectedTetxure))
             mapWalls[blockPosition] = affectedTetxure;
 
+        // Zjisti zda maji byt odemknuty nebo zamknuty dvere do dalsiho levelu
         checkRequirements();
     }
 }
 
+/* Pohyb hrace pomoci mysi */
 float lastXpos, lastYpos;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -202,12 +217,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     float xOffset = xpos - lastXpos;
     lastXpos = xpos;
 
+    // Nastavi uhel hrace
     playerAngle = capRad(playerAngle + xOffset * turnSensitivity);
 
     playerDeltaX = cos(playerAngle);
     playerDeltaY = sin(playerAngle);
 }
 
+/* Zmena velikosti okna */
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
     screenWidth = width;
@@ -218,6 +235,7 @@ void window_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+/* Pohyb hrace pomoci klaves WSAD */
 void movePlayer(GLFWwindow* window)
 {
     // pokud je v menu, nehybat s hracem
@@ -268,6 +286,7 @@ void movePlayer(GLFWwindow* window)
         playerY += moveY;
 }
 
+/* Vyrenderovani devbugovaci mapy v rohu */
 void drawDebug()
 {
     // nakreslit mapu
@@ -369,6 +388,7 @@ void drawDebug()
     glEnd();
 }
 
+/* Vyrenderovani 3D obrazu - Raycasting */
 void draw3D()
 {
     float rayX, rayY, xOffset, yOffset;
@@ -623,22 +643,27 @@ void draw3D()
     glEnd();
 }
 
+/* Vyrenderovani nebe - skybox */
 void drawSky()
 {
+    // Zjisti velikost textury
     int width = 0, height = 0;
     parseInt("../textures/skyBox.txt", "width", &width);
     parseInt("../textures/skyBox.txt", "height", &height);
 
     int skyBoxSize = width * height * 3;
 
+    // Nacist texturu
     int* skyBox = (int*)malloc(skyBoxSize * sizeof(int));
     parseIntArray("../textures/skyBox.txt", "skyBox", skyBox, skyBoxSize);
     
+    // Prizpusobit velikost textury velikosti okna
     int scale = screenHeight / (height * 2);
     
     glPointSize(scale + 1);
     glBegin(GL_POINTS);
 
+    // Nakreslit texturu
     for (int y = 0; y * (scale + 1) < screenHeight / 2; y++)
     {
         for (int x = 0; x < screenWidth / scale; x++)
@@ -655,15 +680,16 @@ void drawSky()
     glEnd();
 }
 
+/* Hlavni funkce hry */
 int WinMain(void)
 {
     GLFWwindow* window;
 
-    /* Initialize the library */
+    // Inicializovat knihovnu
     if (!glfwInit())
         return -1;
 
-    /* Create a windowed mode window and its OpenGL context */
+    // Vytvorit okno
     window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Hello World", NULL, NULL);
     if (!window)
     {
@@ -671,7 +697,6 @@ int WinMain(void)
         return -1;
     }
 
-    /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
     glfwSwapInterval(1);
@@ -686,16 +711,19 @@ int WinMain(void)
     screenWidth = DEFAULT_WIDTH;
     screenHeight = DEFAULT_HEIGHT;
 
+    // Pro vypocet delty casu
     float lastTime = glfwGetTime();
 
+    // Nacist textury
     loadTextureMap();
 
+    // Nacist prvni mapu
     loadMap("../levels/map_1.txt");
 
-    /* Loop until the user closes the window */
+    // Hlavni herni cyklus
     while (!glfwWindowShouldClose(window))
     {
-        // vypocet delta casu
+        // vypocet delty casu
         deltaTime = glfwGetTime() - lastTime;
         lastTime = glfwGetTime();
         
@@ -713,7 +741,7 @@ int WinMain(void)
 
         glfwSwapBuffers(window);
 
-        /* Poll for and process events */
+        // Nacist eventy
         glfwPollEvents();
     }
 
