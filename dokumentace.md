@@ -42,6 +42,9 @@ Potřebný je minimálně level **map_1.txt**, poté případně další podle h
 	- **width**, **height** - rozměry levelu
 	- **spawnX**, **spawnY** - pozice spawnpointu levelu
 	- **nextLevel** - cesta k dalšímu levelu
+	- **requirements** - požadované bloky pro postup do dalšího levelu
+	- **forbidden** - zakázané bloky pro postup do dalšího levelu
+	- **requirementsLenght**, **forbiddenLength** - délka předchozích dvou hodnot
 	- **mapWalls**, **mapFloors**, **mapCeilings** - mapy textur
 
 Soubory viz [Formát souboru](#formát-souborů)
